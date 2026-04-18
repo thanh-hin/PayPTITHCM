@@ -1,94 +1,131 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="32dp"
-    android:background="#FFFFFF"
-    android:gravity="center_horizontal">
+    android:fillViewport="true"
+    android:background="#F8F9FA">
 
-    <View android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
-
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Đăng Nhập"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:textColor="#CE0707"/>
+        android:orientation="vertical"
+        android:padding="28dp"
+        android:gravity="center_horizontal">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Quản lý học phí sinh viên"
-        android:textColor="#757575"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="40dp"/>
+        <ImageView
+            android:id="@+id/imgLogo"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="24dp"
+            android:padding="18dp"
+            android:src="@drawable/logo_ptit"
+            android:scaleType="fitCenter"
+            android:background="@drawable/logo_ptit"
+            android:elevation="6dp" />
 
-    <EditText
-        android:id="@+id/etMSSV"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:hint="Mã số sinh viên (MSSV)"
-        android:paddingHorizontal="20dp"
-        android:background="@drawable/bg_input"
-        android:layout_marginBottom="16dp"
-        android:inputType="text"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PAY PTITHCM"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#CE0707"
+            android:layout_marginTop="10dp" />
 
-    <EditText
-        android:id="@+id/etPassword"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:hint="Mật khẩu"
-        android:paddingHorizontal="20dp"
-        android:background="@drawable/bg_input"
-        android:layout_marginBottom="16dp"
-        android:inputType="textPassword"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quản lý học phí sinh viên"
+            android:textSize="14sp"
+            android:textColor="#757575"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="32dp" />
 
-    <EditText
-        android:id="@+id/etTotp"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:hint="Mã xác thực TOTP (6 số)"
-        android:paddingHorizontal="20dp"
-        android:background="@drawable/bg_input"
-        android:layout_marginBottom="32dp"
-        android:inputType="number"
-        android:gravity="center"
-        android:letterSpacing="0.1"/>
+        <EditText
+            android:id="@+id/etMSSV"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Mã số sinh viên (MSSV)"
+            android:textSize="15sp"
+            android:paddingHorizontal="18dp"
+            android:background="@drawable/bg_input"
+            android:layout_marginBottom="14dp"
+            android:inputType="text" />
 
-    <Button
-        android:id="@+id/btnLogin"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:text="Đăng nhập"
-        android:textAllCaps="false"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#CE0707"/>
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Mật khẩu"
+            android:textSize="15sp"
+            android:paddingHorizontal="18dp"
+            android:background="@drawable/bg_input"
+            android:layout_marginBottom="14dp"
+            android:inputType="textPassword" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hoặc dùng Email sinh viên"
-        android:textSize="12sp"
-        android:textColor="#9E9E9E"
-        android:layout_marginBottom="12dp"/>
+            <EditText
+                android:id="@+id/etTotp"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:hint="Nhập mã OTP"
+                android:textSize="15sp"
+                android:paddingHorizontal="18dp"
+                android:background="@drawable/bg_input"
+                android:inputType="number"
+                android:gravity="center" />
 
-    <ImageButton
-        android:id="@+id/btnGoogle"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@android:drawable/ic_menu_send"
-        app:tint="@color/ce0707"
-        android:background="@android:color/transparent"
-        android:scaleType="centerInside"/>
-</LinearLayout>
+            <TextView
+                android:id="@+id/tvSystemOTP"
+                android:layout_width="100dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="10dp"
+                android:gravity="center"
+                android:text="123456"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#CE0707"
+                android:background="@drawable/bg_otp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Đăng nhập"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#CE0707" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hoặc dùng Email sinh viên"
+            android:textSize="13sp"
+            android:textColor="#9E9E9E"
+            android:layout_marginTop="34dp"
+            android:layout_marginBottom="14dp" />
+
+        <ImageButton
+            android:id="@+id/btnGoogle"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:src="@drawable/ic_gg"
+            android:background="@drawable/bg_google"
+            android:padding="12dp"
+            android:scaleType="centerInside"
+            app:tint="#CE0707" />
+
+    </LinearLayout>
+
+</ScrollView>

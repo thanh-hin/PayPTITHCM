@@ -1,0 +1,63 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="20dp">
+
+        <ImageView
+            android:id="@+id/imgAvatar"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_profile_placeholder"
+            android:layout_marginTop="20dp"/>
+
+        <TextView
+            android:id="@+id/tvProfileName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nguyễn Văn An"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/ptit_red"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:id="@+id/tvProfileMSSV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="B21DCCN001"
+            android:textColor="#757575"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#EEEEEE"
+            android:layout_marginVertical="20dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView android:text="Lớp: CNTT2021" android:id="@+id/tvProfileClass" style="@style/ProfileInfoStyle"/>
+            <TextView android:text="Khoa: Công nghệ thông tin" android:id="@+id/tvProfileFaculty" style="@style/ProfileInfoStyle"/>
+            <TextView android:text="Email: an@student.ptit.edu.vn" android:id="@+id/tvProfileEmail" style="@style/ProfileInfoStyle"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Đăng xuất"
+            android:backgroundTint="@color/ptit_red"
+            android:layout_marginTop="30dp"/>
+
+    </LinearLayout>
+</ScrollView>
