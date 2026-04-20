@@ -1,7 +1,6 @@
 package com.ptithcm.payptithcm;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,50 +12,53 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.ptithcm.payptithcm.activities.LoginActivity;
+import com.ptithcm.payptithcm.models.Student;
 import com.ptithcm.payptithcm.utils.DatabaseHelper;
+import com.ptithcm.payptithcm.utils.SharedPrefs;
 
 public class ProfileFragment extends Fragment {
-    TextView tvName, tvMSSV, tvClass, tvFaculty, tvEmail;
+    TextView tvName, tvMSSV, tvClass, tvFaculty, tvEmail, tvPhone;
     Button btnLogout;
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        // Ánh xạ
-        tvName = view.findViewById(R.id.tvProfileName);
-        tvMSSV = view.findViewById(R.id.tvProfileMSSV);
-        tvClass = view.findViewById(R.id.tvProfileClass);
-        tvEmail = view.findViewById(R.id.tvProfileEmail);
+        tvName    = view.findViewById(R.id.tvProfileName);
+        tvMSSV    = view.findViewById(R.id.tvProfileMSSV);
+        tvClass   = view.findViewById(R.id.tvProfileClass);
+        tvFaculty = view.findViewById(R.id.tvProfileFaculty);
+        tvEmail   = view.findViewById(R.id.tvProfileEmail);
+        tvPhone   = view.findViewById(R.id.tvProfilePhone);
         btnLogout = view.findViewById(R.id.btnLogout);
 
-        loadProfileData();
+        loadProfile();
 
         btnLogout.setOnClickListener(v -> {
-            // Xử lý đăng xuất, xóa SharedPrefs và quay về LoginActivity
-            getActivity().finish();
+            // Xoa session va quay ve man hinh dang nhap
+            new SharedPrefs(getContext()).clearUser();
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
         });
 
         return view;
     }
 
-    private void loadProfileData() {
-        DatabaseHelper dbHelper = DatabaseHelper.getInstance(getContext());
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+    private void loadProfile() {
+        String mssv = new SharedPrefs(getContext()).getUser();
+        Student student = DatabaseHelper.getInstance(getContext()).getStudentById(mssv);
 
-        // Join bảng Student và Class để lấy đầy đủ thông tin
-        String query = "SELECT s.*, c.class_name, c.faculty FROM Student s " +
-                "INNER JOIN Class c ON s.class_id = c.class_id " +
-                "WHERE s.student_id = '21520001'";
-
-        Cursor cursor = db.rawQuery(query, null);
-        if (cursor.moveToFirst()) {
-            tvName.setText(cursor.getString(cursor.getColumnIndex("full_name")));
-            tvMSSV.setText("MSSV: " + cursor.getString(cursor.getColumnIndex("student_id")));
-            tvClass.setText("Lớp: " + cursor.getString(cursor.getColumnIndex("class_name")));
-            tvEmail.setText("Email: " + cursor.getString(cursor.getColumnIndex("email")));
+        if (student != null) {
+            tvName.setText(student.getFullName());
+            tvMSSV.setText("MSSV: " + student.getStudentId());
+            tvClass.setText("Lop: " + (student.getClassName() != null ? student.getClassName() : "N/A"));
+            tvFaculty.setText("Khoa: " + (student.getFaculty() != null ? student.getFaculty() : "N/A"));
+            tvEmail.setText("Email: " + student.getEmail());
+            tvPhone.setText("SDT: " + (student.getPhone() != null ? student.getPhone() : "Chua cap nhat"));
         }
-        cursor.close();
     }
 }

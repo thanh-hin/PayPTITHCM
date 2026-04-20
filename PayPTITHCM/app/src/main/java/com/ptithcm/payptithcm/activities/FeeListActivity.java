@@ -1,4 +1,7 @@
 package com.ptithcm.payptithcm.activities;
 
-public class FeeListActivity {
+import androidx.appcompat.app.AppCompatActivity;
+
+// Khong dung - da chuyen sang PaymentActivity
+public class FeeListActivity extends AppCompatActivity {
 }

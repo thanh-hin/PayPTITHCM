@@ -9,9 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ptithcm.payptithcm.R;
-import com.ptithcm.payptithcm.models.HomeItem;
-
-import java.util.List;
 
 public class HomeAdapter extends BaseAdapter {
     private Context context;
@@ -24,11 +21,8 @@ public class HomeAdapter extends BaseAdapter {
         this.icons = icons;
     }
 
-    public HomeAdapter(Context context, List<HomeItem> items) {
-    }
-
     @Override
-    public int getCount() { return titles.length; }
+    public int getCount() { return titles != null ? titles.length : 0; }
 
     @Override
     public Object getItem(int i) { return titles[i]; }
@@ -43,7 +37,6 @@ public class HomeAdapter extends BaseAdapter {
         }
         ImageView img = view.findViewById(R.id.imgIcon);
         TextView txt = view.findViewById(R.id.tvTitle);
-
         img.setImageResource(icons[i]);
         txt.setText(titles[i]);
         return view;

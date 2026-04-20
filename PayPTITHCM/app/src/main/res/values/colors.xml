@@ -8,11 +8,8 @@
     <color name="divider">#E0E0E0</color>
     <color name="text_main">#212121</color>
     <color name="text_sub">#757575</color>
-    <color name="text_white">#FFFFFF</color>
-
     <color name="status_paid">#2E7D32</color>
     <color name="status_unpaid">#CE0707</color>
-    <color name="status_pending">#F9A825</color>
-    <color name="google_blue">#4285F4</color>
+    <color name="status_overdue">#F57F17</color>
     <color name="ce0707">#CE0707</color>
 </resources>

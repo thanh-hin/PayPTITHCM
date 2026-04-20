@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F8F9FA">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:background="@color/ptit_red">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Xac nhan thanh toan"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_centerVertical="true" />
+    </RelativeLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Khoan phi thanh toan:"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:textColor="#212121"
+                android:layout_marginBottom="8dp" />
+            <TextView
+                android:id="@+id/tvFeeDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="..."
+                android:textSize="14sp"
+                android:textColor="#212121"
+                android:padding="12dp"
+                android:background="#FFFFFF"
+                android:layout_marginBottom="16dp" />
+            <TextView
+                android:id="@+id/tvTotalAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tong: 0 d"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/ptit_red"
+                android:gravity="center"
+                android:padding="16dp"
+                android:background="#FFF5F5"
+                android:layout_marginBottom="24dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phuong thuc thanh toan:"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:textColor="#212121"
+                android:layout_marginBottom="8dp" />
+            <RadioGroup
+                android:id="@+id/rgMethod"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#FFFFFF"
+                android:padding="8dp">
+                <RadioButton android:id="@+id/rbTienMat" android:layout_width="match_parent" android:layout_height="48dp" android:text="Tien mat" android:textSize="15sp" android:buttonTint="@color/ptit_red" android:padding="8dp" />
+                <RadioButton android:id="@+id/rbChuyenKhoan" android:layout_width="match_parent" android:layout_height="48dp" android:text="Chuyen khoan ngan hang" android:textSize="15sp" android:buttonTint="@color/ptit_red" android:padding="8dp" />
+                <RadioButton android:id="@+id/rbViDienTu" android:layout_width="match_parent" android:layout_height="48dp" android:text="Vi dien tu (MoMo, ZaloPay)" android:textSize="15sp" android:buttonTint="@color/ptit_red" android:padding="8dp" />
+            </RadioGroup>
+        </LinearLayout>
+    </ScrollView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+        <Button android:id="@+id/btnCancel" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginEnd="8dp" android:text="Huy" android:textAllCaps="false" android:backgroundTint="#9E9E9E" android:textColor="#FFFFFF" />
+        <Button android:id="@+id/btnConfirm" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2" android:text="Xac nhan thanh toan" android:textAllCaps="false" android:textStyle="bold" android:backgroundTint="@color/ptit_red" android:textColor="#FFFFFF" />
+    </LinearLayout>
+</LinearLayout>
