@@ -14,49 +14,54 @@ import com.ptithcm.payptithcm.models.HistoryItem;
 import java.util.List;
 
 public class HistoryAdapter extends BaseAdapter {
-    private Context context;
-    private List<HistoryItem> historyList;
+    private final Context context;
+    private final List<HistoryItem> historyList;
 
     public HistoryAdapter(Context context, List<HistoryItem> historyList) {
         this.context = context;
         this.historyList = historyList;
     }
 
-    @Override
-    public int getCount() { return historyList != null ? historyList.size() : 0; }
+    @Override public int getCount()               { return historyList != null ? historyList.size() : 0; }
+    @Override public Object getItem(int position) { return historyList.get(position); }
+    @Override public long getItemId(int position) { return historyList.get(position).getPaymentId(); }
+    @Override public boolean hasStableIds()       { return true; }
 
-    @Override
-    public Object getItem(int position) { return historyList.get(position); }
-
-    @Override
-    public long getItemId(int position) { return position; }
+    static class ViewHolder {
+        TextView tvFeeName, tvStatus, tvAmount, tvMethod, tvDate;
+    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder holder;
+
         if (convertView == null) {
             convertView = LayoutInflater.from(context).inflate(R.layout.item_history, parent, false);
+            holder = new ViewHolder();
+            holder.tvFeeName = convertView.findViewById(R.id.tvHistoryFeeName);
+            holder.tvStatus  = convertView.findViewById(R.id.tvHistoryStatus);
+            holder.tvAmount  = convertView.findViewById(R.id.tvHistoryAmount);
+            holder.tvMethod  = convertView.findViewById(R.id.tvHistoryMethod);
+            holder.tvDate    = convertView.findViewById(R.id.tvHistoryDate);
+            convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
         }
-
-        TextView tvFeeName = convertView.findViewById(R.id.tvHistoryFeeName);
-        TextView tvStatus  = convertView.findViewById(R.id.tvHistoryStatus);
-        TextView tvAmount  = convertView.findViewById(R.id.tvHistoryAmount);
-        TextView tvMethod  = convertView.findViewById(R.id.tvHistoryMethod);
-        TextView tvDate    = convertView.findViewById(R.id.tvHistoryDate);
 
         HistoryItem item = historyList.get(position);
 
-        tvFeeName.setText(item.getFeeName());
-        tvAmount.setText(String.format("%,d d", item.getAmount()));
-        tvMethod.setText(item.getMethod() != null ? item.getMethod() : "");
-        tvDate.setText(item.getDate());
+        holder.tvFeeName.setText(item.getFeeName());
+        holder.tvAmount.setText(String.format("%,d đ", item.getAmount()));
+        holder.tvMethod.setText(item.getMethod() != null ? item.getMethod() : "");
+        holder.tvDate.setText(item.getDate());
 
         // Mau trang thai giao dich
         if ("SUCCESS".equals(item.getStatus())) {
-            tvStatus.setText("Thanh cong");
-            tvStatus.setTextColor(Color.parseColor("#2E7D32"));
+            holder.tvStatus.setText("✓ Thành công");
+            holder.tvStatus.setTextColor(Color.parseColor("#2E7D32"));
         } else {
-            tvStatus.setText("That bai");
-            tvStatus.setTextColor(Color.parseColor("#CE0707"));
+            holder.tvStatus.setText("✗ Thất bại");
+            holder.tvStatus.setTextColor(Color.parseColor("#CE0707"));
         }
 
         return convertView;

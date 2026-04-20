@@ -18,7 +18,7 @@ public class SharedPrefs {
         sharedPreferences.edit()
                 .putString(KEY_MSSV, mssv)
                 .putBoolean(KEY_LOGGED_IN, true)
-                .commit();
+                .apply(); // apply() la async, khong block main thread
     }
 
     public String getUser() {
@@ -31,6 +31,6 @@ public class SharedPrefs {
     }
 
     public void clearUser() {
-        sharedPreferences.edit().clear().commit();
+        sharedPreferences.edit().clear().apply();
     }
 }

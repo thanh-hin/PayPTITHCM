@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.ptithcm.payptithcm.activities.LoginActivity;
@@ -37,28 +38,47 @@ public class ProfileFragment extends Fragment {
 
         loadProfile();
 
-        btnLogout.setOnClickListener(v -> {
-            // Xoa session va quay ve man hinh dang nhap
-            new SharedPrefs(getContext()).clearUser();
-            Intent intent = new Intent(getActivity(), LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-        });
+        btnLogout.setOnClickListener(v -> confirmLogout());
 
         return view;
     }
 
     private void loadProfile() {
+        if (getContext() == null) return;
         String mssv = new SharedPrefs(getContext()).getUser();
         Student student = DatabaseHelper.getInstance(getContext()).getStudentById(mssv);
 
         if (student != null) {
-            tvName.setText(student.getFullName());
+            tvName.setText(student.getFullName() != null ? student.getFullName() : "");
             tvMSSV.setText("MSSV: " + student.getStudentId());
-            tvClass.setText("Lop: " + (student.getClassName() != null ? student.getClassName() : "N/A"));
-            tvFaculty.setText("Khoa: " + (student.getFaculty() != null ? student.getFaculty() : "N/A"));
-            tvEmail.setText("Email: " + student.getEmail());
-            tvPhone.setText("SDT: " + (student.getPhone() != null ? student.getPhone() : "Chua cap nhat"));
+            tvClass.setText("Lớp: " + notEmpty(student.getClassName()));
+            tvFaculty.setText("Khoa: " + notEmpty(student.getFaculty()));
+            tvEmail.setText("Email: " + notEmpty(student.getEmail()));
+            tvPhone.setText("SĐT: " + notEmpty(student.getPhone()));
         }
+    }
+
+    /** Hien 'N/A' neu null hoac rong */
+    private String notEmpty(String val) {
+        return (val != null && !val.isEmpty()) ? val : "N/A";
+    }
+
+    /** Xac nhan truoc khi dang xuat, tranh bam nham */
+    private void confirmLogout() {
+        if (getContext() == null) return;
+        new AlertDialog.Builder(getContext())
+                .setTitle("Đăng xuất")
+                .setMessage("Bạn có chắc muốn đăng xuất không?")
+                .setPositiveButton("Đăng xuất", (dialog, which) -> doLogout())
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    private void doLogout() {
+        if (getContext() == null) return;
+        new SharedPrefs(getContext()).clearUser();
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 }

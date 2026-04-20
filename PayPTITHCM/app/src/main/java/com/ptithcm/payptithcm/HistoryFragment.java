@@ -34,7 +34,15 @@ public class HistoryFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Reload khi quay lai tab (sau khi co thanh toan moi)
+        loadHistory();
+    }
+
     private void loadHistory() {
+        if (getContext() == null) return;
         String mssv = new SharedPrefs(getContext()).getUser();
         List<HistoryItem> historyList = DatabaseHelper.getInstance(getContext())
                 .getPaymentHistory(mssv);

@@ -1,6 +1,5 @@
 package com.ptithcm.payptithcm;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.ptithcm.payptithcm.activities.MainActivity;
 import com.ptithcm.payptithcm.adapters.HomeAdapter;
 import com.ptithcm.payptithcm.utils.DatabaseHelper;
 import com.ptithcm.payptithcm.utils.SharedPrefs;
@@ -21,13 +20,12 @@ public class HomeFragment extends Fragment {
     GridView gvHome;
     TextView tvWelcome, tvUnpaidSummary;
 
-    String[] titles = {"Hoc phi", "Lich su", "Ca nhan"};
+    String[] titles = {"Học phí", "Lịch sử", "Cá nhân"};
     int[] icons = {
             R.drawable.ic_fee,
             R.drawable.ic_history,
             R.drawable.ic_support
     };
-    // Map ten menu -> Fragment index trong bottom nav
     int[] navIds = {R.id.nav_fees, R.id.nav_history, R.id.nav_profile};
 
     @Nullable
@@ -45,38 +43,43 @@ public class HomeFragment extends Fragment {
         HomeAdapter adapter = new HomeAdapter(getContext(), titles, icons);
         gvHome.setAdapter(adapter);
 
-        // Click vao o GridView -> chuyen tab tuong ung
         gvHome.setOnItemClickListener((parent, v, position, id) -> {
-            BottomNavigationView nav = getActivity().findViewById(R.id.bottom_navigation);
-            if (nav != null) {
-                nav.setSelectedItemId(navIds[position]);
+            // Su dung navigateTo cua MainActivity de tranh NPE
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).navigateTo(navIds[position]);
             }
         });
 
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Cap nhat thong tin khi quay lai tab nay (vi du: sau khi thanh toan xong)
+        loadWelcome();
+    }
+
     private void loadWelcome() {
+        if (getContext() == null) return; // Guard: fragment chua attach
         String mssv = new SharedPrefs(getContext()).getUser();
         DatabaseHelper db = DatabaseHelper.getInstance(getContext());
 
-        // Lay ten sinh vien
         com.ptithcm.payptithcm.models.Student student = db.getStudentById(mssv);
-        if (student != null) {
-            tvWelcome.setText("Xin chao, " + student.getFullName() + "!");
+        if (student != null && student.getFullName() != null) {
+            tvWelcome.setText("Xin chào, " + student.getFullName() + "!");
         } else {
-            tvWelcome.setText("Xin chao, " + mssv + "!");
+            tvWelcome.setText("Xin chào, " + mssv + "!");
         }
 
-        // Tong hop so khoan chua dong + tong tien
-        int unpaidCount = db.countUnpaidFees(mssv);
-        long totalUnpaid = db.getTotalUnpaid(mssv);
+        int unpaidCount   = db.countUnpaidFees(mssv);
+        long totalUnpaid  = db.getTotalUnpaid(mssv);
 
         if (unpaidCount > 0) {
-            tvUnpaidSummary.setText(unpaidCount + " khoan phi chua dong: "
-                    + String.format("%,d d", totalUnpaid));
+            tvUnpaidSummary.setText(unpaidCount + " khoản phí chưa đóng: "
+                    + String.format("%,d đ", totalUnpaid));
         } else {
-            tvUnpaidSummary.setText("Da dong du hoc phi!");
+            tvUnpaidSummary.setText("✓ Đã đóng đầy đủ học phí!");
         }
     }
 }

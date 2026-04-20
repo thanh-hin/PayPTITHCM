@@ -28,26 +28,26 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Da dang nhap roi thi vao thang MainActivity
         prefs = new SharedPrefs(this);
         if (prefs.isLoggedIn()) {
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
+            goToMain();
             return;
         }
 
         setContentView(R.layout.activity_login);
 
-        etMSSV     = findViewById(R.id.etMSSV);
-        etPassword = findViewById(R.id.etPassword);
-        etTotp     = findViewById(R.id.etTotp);
-        btnLogin   = findViewById(R.id.btnLogin);
-        tvSystemOTP= findViewById(R.id.tvSystemOTP);
+        etMSSV      = findViewById(R.id.etMSSV);
+        etPassword  = findViewById(R.id.etPassword);
+        etTotp      = findViewById(R.id.etTotp);
+        btnLogin    = findViewById(R.id.btnLogin);
+        tvSystemOTP = findViewById(R.id.tvSystemOTP);
 
-        // Sinh OTP ngau nhien 6 chu so
         refreshOTP();
 
         btnLogin.setOnClickListener(v -> doLogin());
+
+        // Click vao OTP label de lam moi OTP
+        tvSystemOTP.setOnClickListener(v -> refreshOTP());
     }
 
     private void doLogin() {
@@ -55,47 +55,64 @@ public class LoginActivity extends AppCompatActivity {
         String pass     = etPassword.getText().toString().trim();
         String otpInput = etTotp.getText().toString().trim();
 
-        // --- Validate ---
+        // --- Validate MSSV ---
         if (TextUtils.isEmpty(mssv)) {
-            etMSSV.setError("Vui long nhap MSSV");
-            etMSSV.requestFocus(); return;
+            etMSSV.setError("Vui lòng nhập MSSV");
+            etMSSV.requestFocus();
+            return;
         }
-        if (TextUtils.isEmpty(pass)) {
-            etPassword.setError("Vui long nhap mat khau");
-            etPassword.requestFocus(); return;
-        }
-        if (TextUtils.isEmpty(otpInput)) {
-            etTotp.setError("Vui long nhap ma OTP");
-            etTotp.requestFocus(); return;
-        }
-
-        // --- Kiem tra OTP ---
-        if (!otpInput.equals(generatedOTP)) {
-            etTotp.setError("Ma OTP khong dung!");
-            refreshOTP();          // cap nhat OTP moi ngay
-            etTotp.setText("");
-            Toast.makeText(this, "OTP sai! Da cap nhat OTP moi.", Toast.LENGTH_SHORT).show();
+        if (mssv.length() < 7 || mssv.length() > 10) {
+            etMSSV.setError("MSSV phải có 7-10 ký tự");
+            etMSSV.requestFocus();
             return;
         }
 
-        // --- Kiem tra MSSV + mat khau trong SQLite ---
+        // --- Validate mật khẩu ---
+        if (TextUtils.isEmpty(pass)) {
+            etPassword.setError("Vui lòng nhập mật khẩu");
+            etPassword.requestFocus();
+            return;
+        }
+
+        // --- Validate OTP ---
+        if (TextUtils.isEmpty(otpInput)) {
+            etTotp.setError("Vui lòng nhập mã OTP");
+            etTotp.requestFocus();
+            return;
+        }
+        if (!otpInput.equals(generatedOTP)) {
+            etTotp.setError("Mã OTP không đúng!");
+            refreshOTP();
+            etTotp.setText("");
+            Toast.makeText(this, "OTP sai! Đã cập nhật OTP mới.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // --- Kiểm tra MSSV + mật khẩu trong SQLite ---
         DatabaseHelper db = DatabaseHelper.getInstance(this);
         Student student = db.authenticateStudent(mssv, pass);
 
         if (student != null) {
             prefs.saveUser(mssv);
-            Toast.makeText(this, "Xin chao, " + student.getFullName() + "!", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
+            String name = (student.getFullName() != null && !student.getFullName().isEmpty())
+                    ? student.getFullName() : mssv;
+            Toast.makeText(this, "Xin chào, " + name + "!", Toast.LENGTH_SHORT).show();
+            goToMain();
         } else {
-            Toast.makeText(this, "MSSV hoac mat khau khong dung!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "MSSV hoặc mật khẩu không đúng!", Toast.LENGTH_LONG).show();
             refreshOTP();
             etTotp.setText("");
+            etPassword.requestFocus();
         }
     }
 
     private void refreshOTP() {
         generatedOTP = String.valueOf(100000 + new Random().nextInt(900000));
         tvSystemOTP.setText(generatedOTP);
+    }
+
+    private void goToMain() {
+        startActivity(new Intent(this, MainActivity.class));
+        finish();
     }
 }
