@@ -19,7 +19,7 @@ import com.ptithcm.payptithcm.utils.DatabaseHelper;
 import com.ptithcm.payptithcm.utils.SharedPrefs;
 
 public class ProfileFragment extends Fragment {
-    TextView tvName, tvMSSV, tvClass, tvFaculty, tvEmail, tvPhone;
+    TextView tvName, tvMSSV, tvClass, tvFaculty, tvEmail, tvPhone, tvAvatarInitial;
     Button btnLogout;
 
     @Nullable
@@ -28,13 +28,14 @@ public class ProfileFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        tvName    = view.findViewById(R.id.tvProfileName);
-        tvMSSV    = view.findViewById(R.id.tvProfileMSSV);
-        tvClass   = view.findViewById(R.id.tvProfileClass);
-        tvFaculty = view.findViewById(R.id.tvProfileFaculty);
-        tvEmail   = view.findViewById(R.id.tvProfileEmail);
-        tvPhone   = view.findViewById(R.id.tvProfilePhone);
-        btnLogout = view.findViewById(R.id.btnLogout);
+        tvName        = view.findViewById(R.id.tvProfileName);
+        tvMSSV        = view.findViewById(R.id.tvProfileMSSV);
+        tvClass       = view.findViewById(R.id.tvProfileClass);
+        tvFaculty     = view.findViewById(R.id.tvProfileFaculty);
+        tvEmail       = view.findViewById(R.id.tvProfileEmail);
+        tvPhone       = view.findViewById(R.id.tvProfilePhone);
+        tvAvatarInitial = view.findViewById(R.id.tvAvatarInitial);
+        btnLogout     = view.findViewById(R.id.btnLogout);
 
         loadProfile();
 
@@ -49,12 +50,23 @@ public class ProfileFragment extends Fragment {
         Student student = DatabaseHelper.getInstance(getContext()).getStudentById(mssv);
 
         if (student != null) {
-            tvName.setText(student.getFullName() != null ? student.getFullName() : "");
+            String fullName = student.getFullName() != null ? student.getFullName() : "";
+            tvName.setText(fullName);
             tvMSSV.setText("MSSV: " + student.getStudentId());
-            tvClass.setText("Lớp: " + notEmpty(student.getClassName()));
-            tvFaculty.setText("Khoa: " + notEmpty(student.getFaculty()));
-            tvEmail.setText("Email: " + notEmpty(student.getEmail()));
-            tvPhone.setText("SĐT: " + notEmpty(student.getPhone()));
+            tvClass.setText(notEmpty(student.getClassName()));
+            tvFaculty.setText(notEmpty(student.getFaculty()));
+            tvEmail.setText(notEmpty(student.getEmail()));
+            tvPhone.setText(notEmpty(student.getPhone()));
+            // Hiện chữ cái đầu của tên làm avatar
+            if (tvAvatarInitial != null && !fullName.isEmpty()) {
+                String[] parts = fullName.split(" ");
+                String lastPart = parts[parts.length - 1];
+                if (!lastPart.isEmpty()) {
+                    tvAvatarInitial.setText(lastPart.substring(0, 1).toUpperCase());
+                } else {
+                    tvAvatarInitial.setText(fullName.substring(0, 1).toUpperCase());
+                }
+            }
         }
     }
 

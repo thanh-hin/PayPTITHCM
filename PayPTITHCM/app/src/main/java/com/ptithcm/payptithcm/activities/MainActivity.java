@@ -2,114 +2,108 @@ package com.ptithcm.payptithcm.activities;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.ptithcm.payptithcm.FeeListFragment;
 import com.ptithcm.payptithcm.HistoryFragment;
 import com.ptithcm.payptithcm.HomeFragment;
 import com.ptithcm.payptithcm.ProfileFragment;
+import com.ptithcm.payptithcm.SupportFragment;
 import com.ptithcm.payptithcm.R;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Tags de tim lai fragment cu, khong tao moi moi lan bam nav
-    private static final String TAG_HOME    = "HOME";
-    private static final String TAG_FEES    = "FEES";
-    private static final String TAG_HISTORY = "HISTORY";
-    private static final String TAG_PROFILE = "PROFILE";
+    private static final int TAB_HOME    = 0;
+    private static final int TAB_FEES    = 1;
+    private static final int TAB_HISTORY = 2;
+    private static final int TAB_PROFILE = 3;
+    private static final int TAB_SUPPORT = 4;
 
-    private Fragment activeFragment;
+    ViewPager2 viewPager;
+    BottomNavigationView bottomNav;
+    private boolean isNavigating = false;
+
+    private final int[] NAV_IDS = {
+        R.id.nav_home, R.id.nav_fees, R.id.nav_history,
+        R.id.nav_profile, R.id.nav_support
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BottomNavigationView nav = findViewById(R.id.bottom_navigation);
+        viewPager = findViewById(R.id.viewPager);
+        bottomNav = findViewById(R.id.bottom_navigation);
 
-        // Chi tao fragment lan dau, sau do show/hide de giu trang thai
-        if (savedInstanceState == null) {
-            showFragment(TAG_HOME, null);
-        } else {
-            // Khi xoay man hinh: phuc hoi fragment dang hien
-            String activeTag = savedInstanceState.getString("ACTIVE_FRAGMENT", TAG_HOME);
-            activeFragment = getSupportFragmentManager().findFragmentByTag(activeTag);
-            if (activeFragment == null) {
-                showFragment(TAG_HOME, null);
+        viewPager.setAdapter(new MainPagerAdapter(this));
+        // Giữ tất cả fragment trong bộ nhớ để không bị reset khi swipe
+        viewPager.setOffscreenPageLimit(4);
+
+        // Sync ViewPager → BottomNav
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                if (!isNavigating) {
+                    isNavigating = true;
+                    bottomNav.setSelectedItemId(NAV_IDS[position]);
+                    isNavigating = false;
+                }
             }
-        }
+        });
 
-        // setOnItemSelectedListener - API moi thay cho deprecated setOnNavigationItemSelectedListener
-        nav.setOnItemSelectedListener(item -> {
+        // Sync BottomNav → ViewPager
+        bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                showFragment(TAG_HOME, null);
-            } else if (id == R.id.nav_fees) {
-                showFragment(TAG_FEES, null);
-            } else if (id == R.id.nav_history) {
-                showFragment(TAG_HISTORY, null);
-            } else if (id == R.id.nav_profile) {
-                showFragment(TAG_PROFILE, null);
+            int tab = tabFromNavId(id);
+            if (tab >= 0 && !isNavigating) {
+                isNavigating = true;
+                viewPager.setCurrentItem(tab, true);
+                isNavigating = false;
             }
             return true;
         });
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (activeFragment != null) {
-            outState.putString("ACTIVE_FRAGMENT", activeFragment.getTag());
-        }
+    private int tabFromNavId(int navId) {
+        if (navId == R.id.nav_home)    return TAB_HOME;
+        if (navId == R.id.nav_fees)    return TAB_FEES;
+        if (navId == R.id.nav_history) return TAB_HISTORY;
+        if (navId == R.id.nav_profile) return TAB_PROFILE;
+        if (navId == R.id.nav_support) return TAB_SUPPORT;
+        return -1;
     }
 
-    /**
-     * Hien fragment theo tag. Neu chua co thi tao moi va add vao back stack.
-     * Neu da co thi chi show lai (giu nguyen trang thai).
-     */
-    private void showFragment(String tag, Bundle args) {
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-
-        // An fragment hien tai
-        if (activeFragment != null) {
-            ft.hide(activeFragment);
-        }
-
-        Fragment target = fm.findFragmentByTag(tag);
-        if (target == null) {
-            // Tao moi lan dau
-            target = createFragment(tag);
-            if (args != null) target.setArguments(args);
-            ft.add(R.id.fragment_container, target, tag);
-        } else {
-            ft.show(target);
-        }
-
-        activeFragment = target;
-        ft.commit();
-    }
-
-    private Fragment createFragment(String tag) {
-        switch (tag) {
-            case TAG_FEES:    return new FeeListFragment();
-            case TAG_HISTORY: return new HistoryFragment();
-            case TAG_PROFILE: return new ProfileFragment();
-            default:          return new HomeFragment();
-        }
-    }
-
-    /**
-     * Public method de cac fragment goi chuyen tab tu ben ngoai (vi du: HomeFragment)
-     */
+    /** Public method cho các fragment gọi chuyển tab */
     public void navigateTo(int navItemId) {
-        BottomNavigationView nav = findViewById(R.id.bottom_navigation);
-        if (nav != null) {
-            nav.setSelectedItemId(navItemId);
+        if (bottomNav != null) {
+            bottomNav.setSelectedItemId(navItemId);
+        }
+    }
+
+    // ===== Adapter =====
+    static class MainPagerAdapter extends FragmentStateAdapter {
+        MainPagerAdapter(FragmentActivity fa) { super(fa); }
+
+        @Override
+        public int getItemCount() { return 5; }
+
+        @NonNull
+        @Override
+        public Fragment createFragment(int position) {
+            switch (position) {
+                case TAB_FEES:    return new FeeListFragment();
+                case TAB_HISTORY: return new HistoryFragment();
+                case TAB_PROFILE: return new ProfileFragment();
+                case TAB_SUPPORT: return new SupportFragment();
+                default:          return new HomeFragment();
+            }
         }
     }
 }

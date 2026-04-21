@@ -53,17 +53,32 @@ public class HistoryAdapter extends BaseAdapter {
         holder.tvFeeName.setText(item.getFeeName());
         holder.tvAmount.setText(String.format("%,d đ", item.getAmount()));
         holder.tvMethod.setText(item.getMethod() != null ? item.getMethod() : "");
-        holder.tvDate.setText(item.getDate());
+        holder.tvDate.setText(formatDateTime(item.getDate()));
 
         // Mau trang thai giao dich
         if ("SUCCESS".equals(item.getStatus())) {
             holder.tvStatus.setText("✓ Thành công");
-            holder.tvStatus.setTextColor(Color.parseColor("#2E7D32"));
+            holder.tvStatus.setTextColor(Color.parseColor("#16A34A"));
+            holder.tvStatus.setBackgroundResource(R.drawable.bg_status_paid);
         } else {
             holder.tvStatus.setText("✗ Thất bại");
             holder.tvStatus.setTextColor(Color.parseColor("#CE0707"));
+            holder.tvStatus.setBackgroundResource(R.drawable.bg_status_unpaid);
         }
 
         return convertView;
+    }
+
+    private String formatDateTime(String raw) {
+        if (raw == null || raw.length() < 10) return raw != null ? raw : "";
+        try {
+            String[] parts = raw.substring(0, 10).split("-");
+            if (parts.length == 3) {
+                String formatted = parts[2] + "/" + parts[1] + "/" + parts[0];
+                if (raw.length() >= 16) formatted += " " + raw.substring(11, 16);
+                return formatted;
+            }
+        } catch (Exception ignored) {}
+        return raw;
     }
 }

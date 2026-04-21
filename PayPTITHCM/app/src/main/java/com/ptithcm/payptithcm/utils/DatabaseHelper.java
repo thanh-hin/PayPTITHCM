@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.ptithcm.payptithcm.models.FeeItem;
 import com.ptithcm.payptithcm.models.HistoryItem;
@@ -17,11 +18,13 @@ import java.util.List;
 import java.util.Locale;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
+    private static final String TAG = "DatabaseHelper";
     private static final String DATABASE_NAME = "payptithcm.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 4; // v4: mật khẩu SHA-256
+
     private static DatabaseHelper instance;
 
-    // Singleton - dung chung 1 ket noi
+    // Singleton - dùng chung 1 kết nối
     public static synchronized DatabaseHelper getInstance(Context context) {
         if (instance == null) {
             instance = new DatabaseHelper(context.getApplicationContext());
@@ -35,14 +38,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // Bang lop hoc
+        // Bảng lớp học
         db.execSQL("CREATE TABLE Class (" +
                 "class_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "class_name TEXT NOT NULL UNIQUE," +
                 "faculty TEXT," +
                 "course_year INTEGER)");
 
-        // Bang sinh vien
+        // Bảng sinh viên
         db.execSQL("CREATE TABLE Student (" +
                 "student_id TEXT PRIMARY KEY," +
                 "full_name TEXT NOT NULL," +
@@ -52,7 +55,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "class_id INTEGER," +
                 "FOREIGN KEY(class_id) REFERENCES Class(class_id))");
 
-        // Bang khoan phi cua sinh vien
+        // Bảng khoản phí của sinh viên
         db.execSQL("CREATE TABLE StudentFee (" +
                 "student_fee_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "student_id TEXT NOT NULL," +
@@ -63,7 +66,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "paid_date TEXT," +
                 "FOREIGN KEY(student_id) REFERENCES Student(student_id))");
 
-        // Bang lich su thanh toan
+        // Bảng lịch sử thanh toán
         db.execSQL("CREATE TABLE Payment (" +
                 "payment_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "student_id TEXT NOT NULL," +
@@ -71,7 +74,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "amount REAL NOT NULL," +
                 "method TEXT," +
                 "status TEXT DEFAULT 'SUCCESS'," +
-                "transaction_id TEXT," +
+                "transaction_id TEXT UNIQUE," +
                 "payment_date TEXT NOT NULL," +
                 "FOREIGN KEY(student_id) REFERENCES Student(student_id))");
 
@@ -79,47 +82,49 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void seedData(SQLiteDatabase db) {
-        // Them lop
-        db.execSQL("INSERT INTO Class (class_name, faculty, course_year) VALUES " +
-                "('D21CQCN01-N', 'Cong nghe thong tin', 2021)");
-        db.execSQL("INSERT INTO Class (class_name, faculty, course_year) VALUES " +
-                "('D22CQDT01-N', 'Dien tu vien thong', 2022)");
+        // ===== LỚP HỌC =====
+        db.execSQL("INSERT INTO Class (class_name, faculty, course_year) VALUES ('D21CQCN01-N', 'Công nghệ thông tin', 2021)");
+        db.execSQL("INSERT INTO Class (class_name, faculty, course_year) VALUES ('D22CQDT01-N', 'Điện tử viễn thông', 2022)");
+        db.execSQL("INSERT INTO Class (class_name, faculty, course_year) VALUES ('D23CQVT01-N', 'Viễn thông', 2023)");
 
-        // Sinh vien mau - password = MSSV de test de
-        db.execSQL("INSERT INTO Student (student_id, full_name, email, password, phone, class_id) " +
-                "VALUES ('21520001', 'Nguyen Van An', 'an@student.ptithcm.edu.vn', '21520001', '0901234567', 1)");
-        db.execSQL("INSERT INTO Student (student_id, full_name, email, password, phone, class_id) " +
-                "VALUES ('21520002', 'Tran Thi Bich', 'bich@student.ptithcm.edu.vn', '21520002', '0912345678', 1)");
-        db.execSQL("INSERT INTO Student (student_id, full_name, email, password, phone, class_id) " +
-                "VALUES ('22520001', 'Le Van Cuong', 'cuong@student.ptithcm.edu.vn', '22520001', '0923456789', 2)");
+        // ===== SINH VIÊN (mật khẩu SHA-256(MSSV)) =====
+        db.execSQL("INSERT INTO Student (student_id, full_name, email, password, phone, class_id) VALUES ('21520001', 'Nguyễn Văn An', 'an@student.ptithcm.edu.vn', '" + HashUtils.sha256("21520001") + "', '0901234567', 1)");
+        db.execSQL("INSERT INTO Student (student_id, full_name, email, password, phone, class_id) VALUES ('21520002', 'Trần Thị Bình', 'binh@student.ptithcm.edu.vn', '" + HashUtils.sha256("21520002") + "', '0912345678', 1)");
+        db.execSQL("INSERT INTO Student (student_id, full_name, email, password, phone, class_id) VALUES ('22520001', 'Lê Văn Cường', 'cuong@student.ptithcm.edu.vn', '" + HashUtils.sha256("22520001") + "', '0923456789', 2)");
+        db.execSQL("INSERT INTO Student (student_id, full_name, email, password, phone, class_id) VALUES ('23520001', 'Phạm Thị Dung', 'dung@student.ptithcm.edu.vn', '" + HashUtils.sha256("23520001") + "', '0934567890', 3)");
 
-        // Hoc phi SV 21520001 - co nhieu trang thai khac nhau de test
-        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status) " +
-                "VALUES ('21520001', 'Hoc phi HK2/2025', 9000000, '2025-06-30', 'UNPAID')");
-        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status) " +
-                "VALUES ('21520001', 'Phi ky tuc xa HK2/2025', 1500000, '2025-06-15', 'UNPAID')");
-        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status) " +
-                "VALUES ('21520001', 'Bao hiem y te 2025', 702000, '2025-03-31', 'OVERDUE')");
-        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status) " +
-                "VALUES ('21520001', 'Phi the sinh vien', 50000, '2025-05-01', 'UNPAID')");
-        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status, paid_date) " +
-                "VALUES ('21520001', 'Hoc phi HK1/2024', 8500000, '2024-11-30', 'PAID', '2024-10-12')");
+        // ===== HỌC PHÍ SV 21520001 (nhiều loại trạng thái để demo) =====
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status) VALUES ('21520001', 'Học phí HK2/2025', 9200000, '2025-07-31', 'UNPAID')");
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status) VALUES ('21520001', 'Phí ký túc xá HK2/2025', 1600000, '2025-07-15', 'UNPAID')");
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status) VALUES ('21520001', 'Bảo hiểm y tế 2025', 702000, '2025-03-31', 'OVERDUE')");
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status) VALUES ('21520001', 'Phí thẻ sinh viên', 50000, '2025-09-30', 'UNPAID')");
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status, paid_date) VALUES ('21520001', 'Học phí HK1/2025', 8800000, '2024-12-31', 'PAID', '2024-12-15')");
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status, paid_date) VALUES ('21520001', 'Học phí HK2/2024', 8500000, '2024-06-30', 'PAID', '2024-06-10')");
 
-        // Hoc phi SV 21520002
-        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status) " +
-                "VALUES ('21520002', 'Hoc phi HK2/2025', 9000000, '2025-06-30', 'UNPAID')");
-        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status) " +
-                "VALUES ('21520002', 'Bao hiem y te 2025', 702000, '2025-03-31', 'UNPAID')");
+        // ===== HỌC PHÍ SV 21520002 =====
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status) VALUES ('21520002', 'Học phí HK2/2025', 9200000, '2025-07-31', 'UNPAID')");
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status) VALUES ('21520002', 'Bảo hiểm y tế 2025', 702000, '2025-03-31', 'OVERDUE')");
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status, paid_date) VALUES ('21520002', 'Học phí HK1/2025', 8800000, '2024-12-31', 'PAID', '2024-12-20')");
 
-        // Lich su thanh toan mau
-        db.execSQL("INSERT INTO Payment (student_id, fee_name, amount, method, status, transaction_id, payment_date) " +
-                "VALUES ('21520001', 'Hoc phi HK1/2024', 8500000, 'Chuyen khoan', 'SUCCESS', 'TXN20241012001', '2024-10-12 09:30:00')");
-        db.execSQL("INSERT INTO Payment (student_id, fee_name, amount, method, status, transaction_id, payment_date) " +
-                "VALUES ('21520001', 'Bao hiem y te 2024', 702000, 'Vi dien tu', 'SUCCESS', 'TXN20240901001', '2024-09-01 14:00:00')");
+        // ===== HỌC PHÍ SV 22520001 =====
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status) VALUES ('22520001', 'Học phí HK2/2025', 9000000, '2025-07-31', 'UNPAID')");
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status, paid_date) VALUES ('22520001', 'Học phí HK1/2025', 8800000, '2024-12-31', 'PAID', '2024-12-05')");
+
+        // ===== HỌC PHÍ SV 23520001 (tân sinh viên) =====
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status) VALUES ('23520001', 'Học phí HK1/2025', 9500000, '2025-01-31', 'OVERDUE')");
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status) VALUES ('23520001', 'Phí nhập học', 500000, '2024-09-30', 'OVERDUE')");
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, amount, deadline, status) VALUES ('23520001', 'Bảo hiểm y tế 2025', 702000, '2025-03-31', 'UNPAID')");
+
+        // ===== LỊCH SỬ THANH TOÁN MẪU =====
+        db.execSQL("INSERT INTO Payment (student_id, fee_name, amount, method, status, transaction_id, payment_date) VALUES ('21520001', 'Học phí HK1/2025', 8800000, '🏦  Chuyển khoản ngân hàng', 'SUCCESS', 'TXN20241215001', '2024-12-15 09:30:00')");
+        db.execSQL("INSERT INTO Payment (student_id, fee_name, amount, method, status, transaction_id, payment_date) VALUES ('21520001', 'Học phí HK2/2024', 8500000, '📱  Ví điện tử (MoMo, ZaloPay)', 'SUCCESS', 'TXN20240610001', '2024-06-10 14:20:00')");
+        db.execSQL("INSERT INTO Payment (student_id, fee_name, amount, method, status, transaction_id, payment_date) VALUES ('21520002', 'Học phí HK1/2025', 8800000, '🏦  Chuyển khoản ngân hàng', 'SUCCESS', 'TXN20241220001', '2024-12-20 10:00:00')");
+        db.execSQL("INSERT INTO Payment (student_id, fee_name, amount, method, status, transaction_id, payment_date) VALUES ('22520001', 'Học phí HK1/2025', 8800000, '💵  Tiền mặt', 'SUCCESS', 'TXN20241205001', '2024-12-05 11:00:00')");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Log.d(TAG, "onUpgrade: " + oldVersion + " -> " + newVersion);
         db.execSQL("DROP TABLE IF EXISTS Payment");
         db.execSQL("DROP TABLE IF EXISTS StudentFee");
         db.execSQL("DROP TABLE IF EXISTS Student");
@@ -129,23 +134,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // ===== DAO METHODS =====
 
-    /** Dang nhap: kiem tra MSSV + mat khau */
+    /** Đăng nhập: kiểm tra MSSV + mật khẩu (SHA-256) */
     public Student authenticateStudent(String mssv, String password) {
         SQLiteDatabase db = getReadableDatabase();
+        String hashedPass = HashUtils.sha256(password);
         Cursor cursor = db.rawQuery(
                 "SELECT s.*, c.class_name, c.faculty FROM Student s " +
                 "LEFT JOIN Class c ON s.class_id = c.class_id " +
                 "WHERE s.student_id = ? AND s.password = ?",
-                new String[]{mssv, password});
+                new String[]{mssv, hashedPass});
         Student student = null;
-        if (cursor.moveToFirst()) {
-            student = cursorToStudent(cursor);
-        }
+        if (cursor.moveToFirst()) student = cursorToStudent(cursor);
         cursor.close();
         return student;
     }
 
-    /** Lay thong tin sinh vien theo MSSV */
+    /** Đăng nhập bằng email + mật khẩu (SHA-256) */
+    public Student authenticateByEmail(String email, String password) {
+        SQLiteDatabase db = getReadableDatabase();
+        String hashedPass = HashUtils.sha256(password);
+        Cursor cursor = db.rawQuery(
+                "SELECT s.*, c.class_name, c.faculty FROM Student s " +
+                "LEFT JOIN Class c ON s.class_id = c.class_id " +
+                "WHERE s.email = ? AND s.password = ?",
+                new String[]{email, hashedPass});
+        Student student = null;
+        if (cursor.moveToFirst()) student = cursorToStudent(cursor);
+        cursor.close();
+        return student;
+    }
+
+    /** Lấy thông tin sinh viên theo MSSV */
     public Student getStudentById(String mssv) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(
@@ -154,9 +173,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "WHERE s.student_id = ?",
                 new String[]{mssv});
         Student student = null;
-        if (cursor.moveToFirst()) {
-            student = cursorToStudent(cursor);
-        }
+        if (cursor.moveToFirst()) student = cursorToStudent(cursor);
         cursor.close();
         return student;
     }
@@ -177,7 +194,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return (idx >= 0 && !cursor.isNull(idx)) ? cursor.getString(idx) : "";
     }
 
-    /** Lay danh sach hoc phi cua sinh vien */
+    /** Lấy danh sách học phí của sinh viên (OVERDUE trước, UNPAID sau, PAID cuối) */
     public List<FeeItem> getStudentFees(String mssv) {
         List<FeeItem> list = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
@@ -198,7 +215,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    /** Lay lich su thanh toan cua sinh vien */
+    /** Lấy lịch sử thanh toán của sinh viên */
     public List<HistoryItem> getPaymentHistory(String mssv) {
         List<HistoryItem> list = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
@@ -221,43 +238,64 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Luu thanh toan + cap nhat trang thai hoc phi thanh PAID
-     * @return transaction_id neu thanh cong, null neu loi
+     * Lưu thanh toán + cập nhật trạng thái học phí thành PAID.
+     * Toàn bộ trong 1 SQLite transaction để đảm bảo atomicity.
+     * @return transaction_id nếu thành công, null nếu lỗi
      */
     public String insertPayment(String mssv, List<FeeItem> selectedFees, String method) {
+        if (selectedFees == null || selectedFees.isEmpty()) return null;
+
         SQLiteDatabase db = getWritableDatabase();
+        // Strip emoji khỏi method name để lưu gọn hơn
+        String cleanMethod = method.replaceAll("[^\\p{L}\\p{Nd}\\s/(),.-]", "").trim();
+
         String txnId = "TXN" + System.currentTimeMillis();
         String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+
         db.beginTransaction();
         try {
             for (FeeItem fee : selectedFees) {
+                // Verify fee vẫn còn chưa đóng trước khi xử lý
+                Cursor check = db.rawQuery(
+                    "SELECT status FROM StudentFee WHERE student_fee_id = ? AND student_id = ?",
+                    new String[]{String.valueOf(fee.getId()), mssv});
+                String currentStatus = null;
+                if (check.moveToFirst()) currentStatus = check.getString(0);
+                check.close();
+
+                if (!"UNPAID".equals(currentStatus) && !"OVERDUE".equals(currentStatus)) {
+                    Log.w(TAG, "Fee " + fee.getId() + " already PAID or not found, skipping");
+                    continue; // Bỏ qua fee đã đóng (không throw error để tránh block toàn bộ)
+                }
+
                 ContentValues cv = new ContentValues();
                 cv.put("student_id", mssv);
                 cv.put("fee_name", fee.getName());
                 cv.put("amount", fee.getAmount());
-                cv.put("method", method);
+                cv.put("method", cleanMethod);
                 cv.put("status", "SUCCESS");
-                cv.put("transaction_id", txnId);
+                cv.put("transaction_id", txnId + "_" + fee.getId()); // unique per fee
                 cv.put("payment_date", now);
                 db.insert("Payment", null, cv);
 
                 ContentValues upd = new ContentValues();
                 upd.put("status", "PAID");
                 upd.put("paid_date", now.substring(0, 10));
-                db.update("StudentFee", upd, "student_fee_id = ?",
-                        new String[]{String.valueOf(fee.getId())});
+                db.update("StudentFee", upd,
+                    "student_fee_id = ? AND student_id = ?",
+                    new String[]{String.valueOf(fee.getId()), mssv});
             }
             db.setTransactionSuccessful();
             return txnId;
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "insertPayment failed: " + e.getMessage(), e);
             return null;
         } finally {
             db.endTransaction();
         }
     }
 
-    /** Dem so khoan phi chua dong (UNPAID + OVERDUE) */
+    /** Đếm số khoản phí chưa đóng (UNPAID + OVERDUE) */
     public int countUnpaidFees(String mssv) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(
@@ -269,7 +307,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return count;
     }
 
-    /** Tinh tong so tien chua dong */
+    /** Tính tổng số tiền chưa đóng */
     public long getTotalUnpaid(String mssv) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(

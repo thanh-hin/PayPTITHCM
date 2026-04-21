@@ -57,24 +57,27 @@ public class FeeAdapter extends BaseAdapter {
 
         holder.tvName.setText(item.getName());
         holder.tvAmount.setText(String.format("%,d đ", item.getAmount()));
-        holder.tvDeadline.setText("Hạn: " + item.getDeadline());
+        holder.tvDeadline.setText("Hạn: " + formatDate(item.getDeadline()));
 
         // Mau sac theo trang thai
         String status = item.getStatus();
         if ("PAID".equals(status)) {
-            holder.tvStatus.setText("Đã đóng");
-            holder.tvStatus.setTextColor(Color.parseColor("#2E7D32"));
+            holder.tvStatus.setText("✓ Đã đóng");
+            holder.tvStatus.setTextColor(Color.parseColor("#16A34A"));
+            holder.tvStatus.setBackgroundResource(R.drawable.bg_status_paid);
             holder.cbSelect.setEnabled(false);
             holder.cbSelect.setChecked(false);
-            convertView.setAlpha(0.6f);
+            convertView.setAlpha(0.65f);
         } else if ("OVERDUE".equals(status)) {
             holder.tvStatus.setText("⚠ Quá hạn!");
-            holder.tvStatus.setTextColor(Color.parseColor("#F57F17"));
+            holder.tvStatus.setTextColor(Color.parseColor("#D97706"));
+            holder.tvStatus.setBackgroundResource(R.drawable.bg_status_overdue);
             holder.cbSelect.setEnabled(true);
             convertView.setAlpha(1.0f);
         } else {
             holder.tvStatus.setText("Chưa đóng");
             holder.tvStatus.setTextColor(Color.parseColor("#CE0707"));
+            holder.tvStatus.setBackgroundResource(R.drawable.bg_status_unpaid);
             holder.cbSelect.setEnabled(true);
             convertView.setAlpha(1.0f);
         }
@@ -98,5 +101,14 @@ public class FeeAdapter extends BaseAdapter {
         });
 
         return convertView;
+    }
+
+    private String formatDate(String raw) {
+        if (raw == null || raw.length() < 10) return raw != null ? raw : "";
+        try {
+            String[] parts = raw.substring(0, 10).split("-");
+            if (parts.length == 3) return parts[2] + "/" + parts[1] + "/" + parts[0];
+        } catch (Exception ignored) {}
+        return raw;
     }
 }

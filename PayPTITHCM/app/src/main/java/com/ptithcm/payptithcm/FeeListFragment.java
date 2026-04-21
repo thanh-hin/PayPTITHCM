@@ -1,6 +1,5 @@
 package com.ptithcm.payptithcm;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,147 +17,183 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.chip.ChipGroup;
 import com.ptithcm.payptithcm.activities.PaymentActivity;
 import com.ptithcm.payptithcm.adapters.FeeAdapter;
 import com.ptithcm.payptithcm.models.FeeItem;
 import com.ptithcm.payptithcm.utils.DatabaseHelper;
+import com.ptithcm.payptithcm.utils.SharedPrefs;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FeeListFragment extends Fragment {
-    ListView lvFees;
-    TextView tvTotalAmount;
-    Button btnPayNow;
-    TextView btnFilterUnpaid, btnFilterPaid, btnFilterOverdue;
 
-    List<FeeItem> fullData;
-    List<FeeItem> filteredData;
+    ListView lvFees;
+    Button btnPayNow;
+    TextView tvTotalAmount;
+    View tvEmptyFees;
+    ChipGroup chipGroupFilter, chipGroupSort;
+
+    List<FeeItem> allFees = new ArrayList<>();
+    List<FeeItem> displayFees = new ArrayList<>();
     FeeAdapter adapter;
-    String currentStatusFilter = "UNPAID";
+
+    private String activeFilter = "ALL";  // ALL | UNPAID | OVERDUE | PAID
+    private String activeSort   = "DEFAULT"; // DEFAULT | AMOUNT_ASC | AMOUNT_DESC | DEADLINE
 
     private final ActivityResultLauncher<Intent> paymentLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                    loadFeeData();
+                    loadFees();
                 }
             });
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_fee_list, container, false);
 
-        lvFees = view.findViewById(R.id.lvFees);
-        tvTotalAmount = view.findViewById(R.id.tvTotalAmount);
-        btnPayNow = view.findViewById(R.id.btnPayNow);
-        
-        btnFilterUnpaid = view.findViewById(R.id.btnFilterUnpaid);
-        btnFilterPaid = view.findViewById(R.id.btnFilterPaid);
-        btnFilterOverdue = view.findViewById(R.id.btnFilterOverdue);
+        lvFees          = view.findViewById(R.id.lvFees);
+        btnPayNow       = view.findViewById(R.id.btnPayNow);
+        tvTotalAmount   = view.findViewById(R.id.tvTotalAmount);
+        tvEmptyFees     = view.findViewById(R.id.tvEmptyFees);
+        chipGroupFilter = view.findViewById(R.id.chipGroupFilter);
+        chipGroupSort   = view.findViewById(R.id.chipGroupSort);
 
-        setupFilters();
-        loadFeeData();
-
-        btnPayNow.setOnClickListener(v -> handlePayment());
-
+        loadFees();
+        setupChips(view);
+        setupPayButton();
         return view;
     }
 
-    private void setupFilters() {
-        if (btnFilterUnpaid == null) return;
+    private void setupChips(View view) {
+        chipGroupFilter.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.isEmpty()) return;
+            int id = checkedIds.get(0);
+            if      (id == R.id.chipUnpaid)  activeFilter = "UNPAID";
+            else if (id == R.id.chipOverdue) activeFilter = "OVERDUE";
+            else if (id == R.id.chipPaid)    activeFilter = "PAID";
+            else                             activeFilter = "ALL";
+            applyFilterAndSort();
+        });
 
-        btnFilterUnpaid.setOnClickListener(v -> {
-            currentStatusFilter = "UNPAID";
-            updateFilterUI(btnFilterUnpaid);
-            applyFilter();
-        });
-        btnFilterPaid.setOnClickListener(v -> {
-            currentStatusFilter = "PAID";
-            updateFilterUI(btnFilterPaid);
-            applyFilter();
-        });
-        btnFilterOverdue.setOnClickListener(v -> {
-            currentStatusFilter = "OVERDUE";
-            updateFilterUI(btnFilterOverdue);
-            applyFilter();
+        chipGroupSort.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.isEmpty()) return;
+            int id = checkedIds.get(0);
+            if      (id == R.id.chipSortAmountAsc)  activeSort = "AMOUNT_ASC";
+            else if (id == R.id.chipSortAmountDesc) activeSort = "AMOUNT_DESC";
+            else if (id == R.id.chipSortDeadline)   activeSort = "DEADLINE";
+            else                                    activeSort = "DEFAULT";
+            applyFilterAndSort();
         });
     }
 
-    private void updateFilterUI(TextView selected) {
-        btnFilterUnpaid.setBackgroundResource(R.drawable.bg_filter_unselected);
-        btnFilterUnpaid.setTextColor(0xFF757575);
-        btnFilterPaid.setBackgroundResource(R.drawable.bg_filter_unselected);
-        btnFilterPaid.setTextColor(0xFF757575);
-        btnFilterOverdue.setBackgroundResource(R.drawable.bg_filter_unselected);
-        btnFilterOverdue.setTextColor(0xFF757575);
-
-        selected.setBackgroundResource(R.drawable.bg_filter_selected);
-        selected.setTextColor(0xFFFFFFFF);
-    }
-
-    private void loadFeeData() {
+    private void loadFees() {
         if (getContext() == null) return;
-        String mssv = getActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE).getString("loggedInMSSV", "21520001");
-        DatabaseHelper dbHelper = DatabaseHelper.getInstance(getContext());
-        
-        fullData = dbHelper.getStudentFees(mssv);
-        applyFilter();
+        String mssv = new SharedPrefs(getContext()).getUser();
+        allFees = DatabaseHelper.getInstance(getContext()).getStudentFees(mssv);
+        applyFilterAndSort();
     }
 
-    private void applyFilter() {
-        if (fullData == null) return;
-        filteredData = new ArrayList<>();
-        
-        for (FeeItem item : fullData) {
-            if (item.getStatus().equals(currentStatusFilter)) {
-                filteredData.add(item);
-            }
+    private void applyFilterAndSort() {
+        // 1. Filter
+        List<FeeItem> filtered;
+        if ("ALL".equals(activeFilter)) {
+            filtered = new ArrayList<>(allFees);
+        } else {
+            filtered = allFees.stream()
+                    .filter(f -> activeFilter.equals(f.getStatus()))
+                    .collect(Collectors.toList());
         }
 
-        adapter = new FeeAdapter(getContext(), filteredData, this::updateTotalWhenChecked);
+        // 2. Sort
+        switch (activeSort) {
+            case "AMOUNT_ASC":
+                filtered.sort(Comparator.comparingLong(FeeItem::getAmount));
+                break;
+            case "AMOUNT_DESC":
+                filtered.sort((a, b) -> Long.compare(b.getAmount(), a.getAmount()));
+                break;
+            case "DEADLINE":
+                filtered.sort(Comparator.comparing(f -> f.getDeadline() != null ? f.getDeadline() : ""));
+                break;
+            default:
+                // Giữ thứ tự mặc định: OVERDUE → UNPAID → PAID
+                filtered.sort((a, b) -> statusOrder(a.getStatus()) - statusOrder(b.getStatus()));
+                break;
+        }
+
+        displayFees = filtered;
+
+        // Reset selection state (để tránh chọn sai sau filter)
+        for (FeeItem item : displayFees) {
+            if ("PAID".equals(item.getStatus())) item.setSelected(false);
+        }
+
+        adapter = new FeeAdapter(getContext(), displayFees, this::updateTotal);
         lvFees.setAdapter(adapter);
-        
-        btnPayNow.setVisibility(currentStatusFilter.equals("PAID") ? View.GONE : View.VISIBLE);
-        updateTotalWhenChecked();
+
+        boolean empty = displayFees == null || displayFees.isEmpty();
+        tvEmptyFees.setVisibility(empty ? View.VISIBLE : View.GONE);
+        lvFees.setVisibility(empty ? View.GONE : View.VISIBLE);
+
+        updateTotal();
     }
 
-    private void updateTotalWhenChecked() {
+    private int statusOrder(String status) {
+        if ("OVERDUE".equals(status)) return 1;
+        if ("UNPAID".equals(status))  return 2;
+        return 3;
+    }
+
+    private void updateTotal() {
         long total = 0;
-        int count = 0;
-        for (FeeItem item : filteredData) {
-            if (item.isSelected()) {
-                total += item.getAmount();
-                count++;
-            }
-        }
+        List<FeeItem> selected = getSelectedFees();
+        for (FeeItem item : selected) total += item.getAmount();
         tvTotalAmount.setText(String.format("%,d đ", total));
-        btnPayNow.setEnabled(count > 0);
-        btnPayNow.setText(count > 0 ? "Thanh toán đã chọn (" + String.format("%,dđ", total) + ")" : "Thanh toán");
+        btnPayNow.setEnabled(!selected.isEmpty());
+        btnPayNow.setText(selected.isEmpty()
+                ? "Chọn khoản phí để thanh toán"
+                : "Thanh toán " + selected.size() + " khoản (" + String.format("%,d đ", total) + ")");
     }
 
-    private void handlePayment() {
+    private List<FeeItem> getSelectedFees() {
         List<FeeItem> selected = new ArrayList<>();
-        long sum = 0;
-        for (FeeItem item : filteredData) {
-            if (item.isSelected()) {
-                selected.add(item);
-                sum += item.getAmount();
-            }
+        if (displayFees == null) return selected;
+        for (FeeItem item : displayFees) {
+            if (item.isSelected()) selected.add(item);
         }
-        
-        if (sum == 0) {
-            Toast.makeText(getContext(), "Vui lòng chọn khoản phí!", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        return selected;
+    }
 
-        Intent intent = new Intent(getActivity(), PaymentActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putLong("TOTAL_AMOUNT", sum);
-        ArrayList<Integer> ids = new ArrayList<>();
-        for (FeeItem item : selected) ids.add(item.getId());
-        bundle.putIntegerArrayList("SELECTED_IDS", ids);
-        intent.putExtra("data", bundle);
-        paymentLauncher.launch(intent);
+    private void setupPayButton() {
+        btnPayNow.setOnClickListener(v -> {
+            List<FeeItem> selected = getSelectedFees();
+            if (selected.isEmpty()) {
+                Toast.makeText(getContext(), "Vui lòng chọn ít nhất 1 khoản phí!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            long total = 0;
+            StringBuilder feeNames = new StringBuilder();
+            for (FeeItem item : selected) {
+                total += item.getAmount();
+                feeNames.append("• ").append(item.getName())
+                        .append(": ").append(String.format("%,d đ", item.getAmount()))
+                        .append("\n");
+            }
+            Intent intent = new Intent(getActivity(), PaymentActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putLong("TOTAL_AMOUNT", total);
+            bundle.putString("FEE_DETAIL", feeNames.toString().trim());
+            ArrayList<Integer> ids = new ArrayList<>();
+            for (FeeItem item : selected) ids.add(item.getId());
+            bundle.putIntegerArrayList("SELECTED_IDS", ids);
+            intent.putExtra("data", bundle);
+            paymentLauncher.launch(intent);
+        });
     }
 }
