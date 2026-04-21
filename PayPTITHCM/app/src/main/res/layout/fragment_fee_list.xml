@@ -1,63 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#F8F9FA">
+
+    <!-- HEADER BO GOC -->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="120dp"
+        android:background="@drawable/bg_home_header"
         android:padding="20dp"
-        android:background="@color/ptit_red">
+        android:layout_marginTop="-20dp">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Danh sach khoan phi"
+            android:text="Khoản phí"
             android:textColor="#FFFFFF"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_centerVertical="true" />
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp" />
     </RelativeLayout>
+
+    <!-- STATUS FILTER -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="14dp"
+        android:paddingTop="14dp"
+        android:weightSum="3">
+
+        <TextView
+            android:id="@+id/btnFilterUnpaid"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="Chưa đóng"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/bg_filter_selected"
+            android:layout_marginEnd="4dp"/>
+
+        <TextView
+            android:id="@+id/btnFilterPaid"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="Đã đóng"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:textColor="#757575"
+            android:background="@drawable/bg_filter_unselected"
+            android:layout_marginHorizontal="2dp"/>
+
+        <TextView
+            android:id="@+id/btnFilterOverdue"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="Quá hạn"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:textColor="#757575"
+            android:background="@drawable/bg_filter_unselected"
+            android:layout_marginStart="4dp"/>
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:gravity="center_vertical"
-        android:background="#FFF5F5">
+        android:gravity="center_vertical">
         <TextView
             android:id="@+id/tvTotalLabel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Tong da chon:"
+            android:text="Tổng đã chọn:"
             android:textSize="14sp"
             android:textColor="#757575" />
         <TextView
             android:id="@+id/tvTotalAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0 d"
+            android:text="0 đ"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/ptit_red" />
     </LinearLayout>
+
     <ListView
         android:id="@+id/lvFees"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:divider="#E0E0E0"
-        android:dividerHeight="1dp" />
+        android:divider="@android:color/transparent"
+        android:dividerHeight="8dp"
+        android:paddingHorizontal="14dp" />
+
     <Button
         android:id="@+id/btnPayNow"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_margin="16dp"
-        android:text="Chon khoan phi de thanh toan"
+        android:text="Thanh toán"
         android:textAllCaps="false"
         android:textStyle="bold"
         android:backgroundTint="@color/ptit_red"
-        android:textColor="#FFFFFF"
-        android:enabled="false" />
+        android:textColor="#FFFFFF" />
+
 </LinearLayout>
