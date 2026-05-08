@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find app/src/main/res/drawable* -name \"*.xml\" -o -name \"*.png\")",
+      "Bash(npm install:*)",
+      "Read(//usr/local/**)",
+      "Read(//usr/**)",
+      "Bash(cmd.exe /c \"node --version && npm --version\" 2>&1)",
+      "Bash(cmd.exe /c \"cd /d D:\\\\\\\\android\\\\\\\\PayPTITHCM\\\\\\\\server && node --version\" 2>&1)",
+      "Bash(cmd.exe /c \"node -e \\\\\"console.log\\('node ok'\\)\\\\\"\" 2>&1)",
+      "Bash(powershell.exe -Command \"node --version; npm --version\" 2>&1)",
+      "Bash(powershell.exe -Command \"Get-Command node -ErrorAction SilentlyContinue; where.exe node 2>&1\")",
+      "Bash(cmd.exe /c \"cd /d D:\\\\android\\\\PayPTITHCM && git status 2>&1\")",
+      "Bash(cmd.exe /c \"cd /d D:\\\\android\\\\PayPTITHCM & git status\")",
+      "Bash(powershell.exe -Command \"Set-Location 'D:\\\\android\\\\PayPTITHCM'; git status\" 2>&1)",
+      "Bash(powershell.exe -Command \"Set-Location 'D:\\\\android\\\\PayPTITHCM'; git log --oneline -3\")",
+      "Bash(powershell.exe -Command @\"\nSet-Location 'D:\\\\android\\\\PayPTITHCM'\ngit add PayPTITHCM/app/build.gradle.kts\ngit add PayPTITHCM/app/src/main/AndroidManifest.xml\ngit add PayPTITHCM/gradle/libs.versions.toml\ngit add PayPTITHCM/app/src/main/java/com/ptithcm/payptithcm/\ngit add PayPTITHCM/app/src/main/res/layout/\ngit add PayPTITHCM/app/src/main/res/menu/\ngit add PayPTITHCM/app/src/main/res/drawable/\ngit add PayPTITHCM/app/src/main/res/values/\ngit add server/\ngit status --short\n\"@)",
+      "Bash(powershell.exe -Command \"Set-Location 'D:\\\\android\\\\PayPTITHCM'; git add PayPTITHCM/app/build.gradle.kts; git add PayPTITHCM/app/src/main/AndroidManifest.xml; git add PayPTITHCM/gradle/libs.versions.toml; git add 'PayPTITHCM/app/src/main/java/com/ptithcm/payptithcm/'; git add 'PayPTITHCM/app/src/main/res/layout/'; git add 'PayPTITHCM/app/src/main/res/menu/'; git add 'PayPTITHCM/app/src/main/res/drawable/'; git add 'PayPTITHCM/app/src/main/res/values/'; git add server/\")",
+      "Bash(powershell.exe -Command \"Set-Location 'D:\\\\android\\\\PayPTITHCM'; git commit -m 'feat: nang cap toan dien - backend Node.js, OTP email, hash password, ViewPager2 swipe, filter chips, MoMo/QR payment, tab Ho tro\n\n- Them backend Node.js/Express \\(server/\\): auth JWT, bcrypt, OTP mock log, contact API\n- Hash mat khau SHA-256 \\(Android offline\\) va bcrypt \\(server\\)\n- OTP khong hien tren man hinh, gui qua API, log ra console server\n- Dang nhap bang MSSV hoac Email\n- Chuyen FrameLayout sang ViewPager2 - swipe giua 5 fragment\n- Them filter chips \\(Tat ca/Chua dong/Qua han/Da dong\\) va sort chips\n- Them tab Ho tro \\(tab 5\\): SĐT, email, dia chi, gio lam viec\n- Giai lap thanh toan MoMo \\(90% success, countdown, style tim\\)\n- QR ngan hang BIDV voi ZXing BarcodeEncoder, countdown 15 phut\n- PaymentActivity route sang MoMo/QR theo phuong thuc chon\n- Fix bugs: xmlns:app, compileSdk syntax, null safety, import cleanup\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>'\")",
+      "Bash(powershell.exe -Command \"Set-Location 'D:\\\\android\\\\PayPTITHCM'; git push origin v2 2>&1\")",
+      "Bash(powershell.exe -Command \"Set-Location 'D:\\\\android\\\\PayPTITHCM'; git pull origin v2 --rebase 2>&1\")",
+      "Bash(powershell.exe -Command \"Set-Location 'D:\\\\android\\\\PayPTITHCM'; git checkout --theirs 'PayPTITHCM/app/src/main/java/com/ptithcm/payptithcm/FeeListFragment.java'; git checkout --theirs 'PayPTITHCM/app/src/main/res/layout/fragment_fee_list.xml'; git checkout --ours 'PayPTITHCM/app/src/main/java/com/ptithcm/payptithcm/HomeFragment.java'; git checkout --ours 'PayPTITHCM/app/src/main/res/layout/fragment_home.xml'\")"
+    ]
+  }
+}

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg_gray">
+
+    <!-- ===== HEADER ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_header"
+        android:padding="20dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Xác nhận thanh toán"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- ===== TOTAL CARD ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/bg_header"
+                android:padding="24dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tổng thanh toán"
+                    android:textSize="13sp"
+                    android:textColor="#FFD6D6"/>
+
+                <TextView
+                    android:id="@+id/tvTotalAmount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 đ"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <!-- ===== CHI TIẾT KHOẢN PHÍ ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:elevation="3dp"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Khoản phí thanh toán"
+                        android:textStyle="bold"
+                        android:textSize="15sp"
+                        android:textColor="@color/text_main"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider"
+                    android:layout_marginBottom="12dp"/>
+
+                <TextView
+                    android:id="@+id/tvFeeDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="..."
+                    android:textSize="14sp"
+                    android:textColor="@color/text_main"
+                    android:lineSpacingExtra="4dp"/>
+            </LinearLayout>
+
+            <!-- ===== PHƯƠNG THỨC ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:elevation="3dp"
+                android:padding="16dp"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Phương thức thanh toán"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:textColor="@color/text_main"
+                    android:layout_marginBottom="12dp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider"
+                    android:layout_marginBottom="12dp"/>
+
+                <RadioGroup
+                    android:id="@+id/rgMethod"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/rbTienMat"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="💵  Tiền mặt"
+                        android:textSize="15sp"
+                        android:buttonTint="@color/ptit_red"
+                        android:paddingStart="8dp"/>
+
+                    <RadioButton
+                        android:id="@+id/rbChuyenKhoan"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="🏦  Chuyển khoản ngân hàng"
+                        android:textSize="15sp"
+                        android:buttonTint="@color/ptit_red"
+                        android:paddingStart="8dp"/>
+
+                    <RadioButton
+                        android:id="@+id/rbViDienTu"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="📱  Ví điện tử (MoMo, ZaloPay)"
+                        android:textSize="15sp"
+                        android:buttonTint="@color/ptit_red"
+                        android:paddingStart="8dp"/>
+                </RadioGroup>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- ===== BUTTONS ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:background="@color/white"
+        android:elevation="8dp">
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="10dp"
+            android:text="Huỷ"
+            android:textAllCaps="false"
+            android:textSize="15sp"
+            android:background="@drawable/bg_button_secondary"
+            android:textColor="@color/text_sub"
+            android:stateListAnimator="@null"/>
+
+        <Button
+            android:id="@+id/btnConfirm"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="2"
+            android:text="Xác nhận thanh toán"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:background="@drawable/bg_button_primary"
+            android:textColor="#FFFFFF"
+            android:stateListAnimator="@null"/>
+    </LinearLayout>
+
+</LinearLayout>

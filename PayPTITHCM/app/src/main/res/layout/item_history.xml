@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="5dp"
+    android:background="@drawable/bg_card"
+    android:elevation="3dp"
+    android:padding="16dp">
+
+    <!-- Row 1: Tên + Trạng thái -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvHistoryFeeName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="@color/text_main"
+            android:layout_marginEnd="8dp"/>
+
+        <TextView
+            android:id="@+id/tvHistoryStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:background="@drawable/bg_status_paid"/>
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider"
+        android:layout_marginVertical="10dp"/>
+
+    <!-- Row 2: Số tiền + Phương thức -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvHistoryAmount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/ptit_red"
+            android:textSize="15sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tvHistoryMethod"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_sub"
+            android:textSize="12sp"
+            android:background="@color/bg_gray"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="3dp"/>
+    </LinearLayout>
+
+    <!-- Row 3: Ngày -->
+    <TextView
+        android:id="@+id/tvHistoryDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/text_hint"
+        android:textSize="12sp"/>
+
+</LinearLayout>
