@@ -13,6 +13,7 @@ gson = "2.10.1"
 viewpager2 = "1.1.0"
 zxing = "4.3.0"
 fragment = "1.8.5"
+mpandroidchart = "v3.1.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -29,6 +30,7 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 viewpager2 = { group = "androidx.viewpager2", name = "viewpager2", version.ref = "viewpager2" }
 zxing-android = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "zxing" }
 fragment = { group = "androidx.fragment", name = "fragment", version.ref = "fragment" }
+mpandroidchart = { group = "com.github.PhilJay", name = "MPAndroidChart", version.ref = "mpandroidchart" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

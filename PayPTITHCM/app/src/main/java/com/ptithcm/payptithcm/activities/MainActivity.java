@@ -1,6 +1,8 @@
 package com.ptithcm.payptithcm.activities;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,22 +19,22 @@ import com.ptithcm.payptithcm.ProfileFragment;
 import com.ptithcm.payptithcm.SupportFragment;
 import com.ptithcm.payptithcm.R;
 
+import java.util.Stack;
+
 public class MainActivity extends AppCompatActivity {
 
-    private static final int TAB_HOME    = 0;
-    private static final int TAB_FEES    = 1;
-    private static final int TAB_HISTORY = 2;
-    private static final int TAB_PROFILE = 3;
-    private static final int TAB_SUPPORT = 4;
+    public static final int TAB_FEES    = 0;
+    public static final int TAB_HOME    = 1;
+    public static final int TAB_PROFILE = 2;
+    public static final int TAB_HISTORY = 3;
+    public static final int TAB_SUPPORT = 4;
 
     ViewPager2 viewPager;
     BottomNavigationView bottomNav;
+    ImageButton btnBackHeader;
+    
     private boolean isNavigating = false;
-
-    private final int[] NAV_IDS = {
-        R.id.nav_home, R.id.nav_fees, R.id.nav_history,
-        R.id.nav_profile, R.id.nav_support
-    };
+    private final Stack<Integer> navigationStack = new Stack<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,53 +43,106 @@ public class MainActivity extends AppCompatActivity {
 
         viewPager = findViewById(R.id.viewPager);
         bottomNav = findViewById(R.id.bottom_navigation);
+        btnBackHeader = findViewById(R.id.btnBackHeader);
 
         viewPager.setAdapter(new MainPagerAdapter(this));
-        // Giữ tất cả fragment trong bộ nhớ để không bị reset khi swipe
+        
+        // 1. Vô hiệu hóa vuốt tay
+        viewPager.setUserInputEnabled(false);
+        
+        // 2. Loại bỏ over-scroll
+        if (viewPager.getChildAt(0) != null) {
+            viewPager.getChildAt(0).setOverScrollMode(View.OVER_SCROLL_NEVER);
+        }
+        
         viewPager.setOffscreenPageLimit(4);
 
-        // Sync ViewPager → BottomNav
+        // Sync ViewPager -> BottomNav + Quản lý nút Back
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
-                if (!isNavigating) {
-                    isNavigating = true;
-                    bottomNav.setSelectedItemId(NAV_IDS[position]);
-                    isNavigating = false;
-                }
+                // Hiển thị nút Back nếu không ở trang Home
+                btnBackHeader.setVisibility(position == TAB_HOME ? View.GONE : View.VISIBLE);
+
+                if (isNavigating) return;
+                isNavigating = true;
+                if (position == TAB_FEES) bottomNav.setSelectedItemId(R.id.nav_fees);
+                else if (position == TAB_HOME) bottomNav.setSelectedItemId(R.id.nav_home);
+                else if (position == TAB_PROFILE) bottomNav.setSelectedItemId(R.id.nav_profile);
+                isNavigating = false;
             }
         });
 
-        // Sync BottomNav → ViewPager
+        // Sync BottomNav -> ViewPager
         bottomNav.setOnItemSelectedListener(item -> {
+            if (isNavigating) return true;
             int id = item.getItemId();
-            int tab = tabFromNavId(id);
-            if (tab >= 0 && !isNavigating) {
+            int targetTab = -1;
+            if (id == R.id.nav_fees) targetTab = TAB_FEES;
+            else if (id == R.id.nav_home) targetTab = TAB_HOME;
+            else if (id == R.id.nav_profile) targetTab = TAB_PROFILE;
+            
+            if (targetTab != -1 && targetTab != viewPager.getCurrentItem()) {
+                pushToStack(viewPager.getCurrentItem());
                 isNavigating = true;
-                viewPager.setCurrentItem(tab, true);
+                viewPager.setCurrentItem(targetTab, false);
                 isNavigating = false;
             }
             return true;
         });
+
+        // Xử lý sự kiện nhấn nút Trở về
+        btnBackHeader.setOnClickListener(v -> {
+            if (!navigationStack.isEmpty()) {
+                int lastTab = navigationStack.pop();
+                isNavigating = true;
+                viewPager.setCurrentItem(lastTab, false);
+                isNavigating = false;
+            } else {
+                // Nếu stack trống, mặc định về Home
+                isNavigating = true;
+                viewPager.setCurrentItem(TAB_HOME, false);
+                isNavigating = false;
+            }
+        });
+
+        // Mặc định vào trang Home
+        viewPager.setCurrentItem(TAB_HOME, false);
+        bottomNav.setSelectedItemId(R.id.nav_home);
     }
 
-    private int tabFromNavId(int navId) {
-        if (navId == R.id.nav_home)    return TAB_HOME;
-        if (navId == R.id.nav_fees)    return TAB_FEES;
-        if (navId == R.id.nav_history) return TAB_HISTORY;
-        if (navId == R.id.nav_profile) return TAB_PROFILE;
-        if (navId == R.id.nav_support) return TAB_SUPPORT;
-        return -1;
-    }
-
-    /** Public method cho các fragment gọi chuyển tab */
-    public void navigateTo(int navItemId) {
-        if (bottomNav != null) {
-            bottomNav.setSelectedItemId(navItemId);
+    private void pushToStack(int tabIndex) {
+        // Tránh lưu trùng lặp liên tiếp hoặc lưu trang Home vào stack quá nhiều
+        if (navigationStack.isEmpty() || navigationStack.peek() != tabIndex) {
+            navigationStack.push(tabIndex);
         }
     }
 
-    // ===== Adapter =====
+    /** Phương thức để các fragment gọi chuyển trang */
+    public void navigateTo(int navItemId) {
+        int current = viewPager.getCurrentItem();
+        int target = -1;
+        if (navItemId == R.id.nav_fees) target = TAB_FEES;
+        else if (navItemId == R.id.nav_home) target = TAB_HOME;
+        else if (navItemId == R.id.nav_profile) target = TAB_PROFILE;
+        else if (navItemId == R.id.nav_history) target = TAB_HISTORY;
+        else if (navItemId == R.id.nav_support) target = TAB_SUPPORT;
+
+        if (target != -1 && target != current) {
+            pushToStack(current);
+            viewPager.setCurrentItem(target, false);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!navigationStack.isEmpty()) {
+            btnBackHeader.performClick();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     static class MainPagerAdapter extends FragmentStateAdapter {
         MainPagerAdapter(FragmentActivity fa) { super(fa); }
 
@@ -99,8 +154,8 @@ public class MainActivity extends AppCompatActivity {
         public Fragment createFragment(int position) {
             switch (position) {
                 case TAB_FEES:    return new FeeListFragment();
-                case TAB_HISTORY: return new HistoryFragment();
                 case TAB_PROFILE: return new ProfileFragment();
+                case TAB_HISTORY: return new HistoryFragment();
                 case TAB_SUPPORT: return new SupportFragment();
                 default:          return new HomeFragment();
             }

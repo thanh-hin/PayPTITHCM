@@ -6,9 +6,7 @@
     android:gravity="center"
     android:padding="16dp"
     android:background="@drawable/bg_home_item"
-    android:orientation="vertical"
-    android:clickable="true"
-    android:focusable="true">
+    android:orientation="vertical">
 
     <!-- Icon trong vòng tròn -->
     <LinearLayout

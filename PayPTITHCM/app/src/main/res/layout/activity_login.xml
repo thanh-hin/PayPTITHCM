@@ -10,24 +10,23 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- ===== HEADER GRADIENT ===== -->
+        <!-- ===== HEADER ===== -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="220dp"
+            android:layout_height="200dp"
             android:orientation="vertical"
             android:gravity="center"
             android:background="@drawable/bg_login_header"
-            android:paddingTop="40dp"
-            android:paddingBottom="24dp">
+            android:paddingBottom="20dp">
 
             <ImageView
                 android:id="@+id/imgLogo"
-                android:layout_width="90dp"
-                android:layout_height="90dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:src="@drawable/logo_ptit"
                 android:scaleType="fitCenter"
                 android:background="@drawable/bg_icon_circle"
-                android:padding="10dp" />
+                android:padding="8dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -36,19 +35,10 @@
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:textColor="#FFFFFF"
-                android:letterSpacing="0.08"
-                android:layout_marginTop="12dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Cổng thanh toán học phí sinh viên"
-                android:textSize="13sp"
-                android:textColor="#FFD6D6"
-                android:layout_marginTop="4dp"/>
+                android:layout_marginTop="10dp"/>
         </LinearLayout>
 
-        <!-- ===== FORM CARD ===== -->
+        <!-- ===== FORM ===== -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -56,7 +46,7 @@
             android:background="@drawable/bg_card"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:layout_marginTop="-24dp"
+            android:layout_marginTop="-30dp"
             android:padding="24dp"
             android:elevation="8dp">
 
@@ -67,124 +57,108 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_main"
-                android:layout_marginBottom="20dp"/>
+                android:layout_marginBottom="16dp"/>
 
-            <!-- MSSV hoặc Email -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="MSSV hoặc Email"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_sub"
-                android:layout_marginBottom="6dp"/>
+            <!-- MSSV -->
             <EditText
                 android:id="@+id/etMSSV"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:hint="Nhập MSSV hoặc địa chỉ Email"
-                android:textSize="14sp"
-                android:paddingHorizontal="16dp"
+                android:hint="MSSV (VD: 21520001)"
+                android:text="21520001"
                 android:background="@drawable/bg_input"
-                android:layout_marginBottom="16dp"
-                android:inputType="textEmailAddress"
-                android:textColor="@color/text_main"
-                android:textColorHint="@color/text_hint"/>
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="12dp"
+                android:inputType="text"/>
 
-            <!-- Mật khẩu -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Mật khẩu"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_sub"
-                android:layout_marginBottom="6dp"/>
+            <!-- Password -->
             <EditText
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:hint="Nhập mật khẩu"
-                android:textSize="15sp"
-                android:paddingHorizontal="16dp"
+                android:hint="Mật khẩu"
+                android:text="21520001"
                 android:background="@drawable/bg_input"
+                android:paddingHorizontal="16dp"
                 android:layout_marginBottom="16dp"
-                android:inputType="textPassword"
-                android:textColor="@color/text_main"
-                android:textColorHint="@color/text_hint"/>
+                android:inputType="textPassword"/>
 
-            <!-- OTP -->
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEE" android:layout_marginBottom="16dp"/>
+
+            <!-- KHU VỰC HIỂN THỊ OTP (CỰC KỲ RÕ RÀNG) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="6dp">
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="16dp"
+                android:background="#15CE0707"
+                android:layout_marginBottom="16dp">
 
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Mã xác thực OTP"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_sub"/>
-
-                <Button
-                    android:id="@+id/btnSendOtp"
                     android:layout_width="wrap_content"
-                    android:layout_height="34dp"
-                    android:text="Gửi OTP"
-                    android:textSize="12sp"
-                    android:textAllCaps="false"
+                    android:layout_height="wrap_content"
+                    android:text="MÃ OTP CỦA BẠN"
+                    android:textSize="11sp"
                     android:textColor="@color/ptit_red"
-                    android:background="@drawable/bg_otp"
-                    android:paddingHorizontal="14dp"
-                    android:stateListAnimator="@null"/>
+                    android:textStyle="bold"
+                    android:alpha="0.7"/>
+
+                <TextView
+                    android:id="@+id/tvGeneratedOtp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="BẤM NÚT DƯỚI ĐỂ LẤY MÃ"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/ptit_red"
+                    android:layout_marginTop="4dp"/>
             </LinearLayout>
+
+            <Button
+                android:id="@+id/btnSendOtp"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:text="GỬI MÃ OTP"
+                android:background="@drawable/bg_otp"
+                android:textColor="@color/ptit_red"
+                android:layout_marginBottom="16dp"
+                android:stateListAnimator="@null"/>
 
             <EditText
                 android:id="@+id/etTotp"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:hint="Nhập mã OTP 6 chữ số"
-                android:textSize="18sp"
-                android:paddingHorizontal="16dp"
+                android:layout_height="54dp"
+                android:hint="Nhập 6 số vừa thấy ở trên"
                 android:background="@drawable/bg_input"
+                android:paddingHorizontal="16dp"
                 android:layout_marginBottom="24dp"
                 android:inputType="number"
                 android:gravity="center"
-                android:letterSpacing="0.2"
-                android:textColor="@color/text_main"
-                android:textColorHint="@color/text_hint"/>
+                android:textSize="20sp"
+                android:letterSpacing="0.2"/>
 
-            <!-- Login Button -->
             <Button
                 android:id="@+id/btnLogin"
                 android:layout_width="match_parent"
-                android:layout_height="54dp"
-                android:text="Đăng nhập"
-                android:textSize="16sp"
+                android:layout_height="56dp"
+                android:text="ĐĂNG NHẬP"
                 android:textStyle="bold"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
                 android:background="@drawable/bg_button_primary"
-                android:stateListAnimator="@null"/>
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"/>
 
             <TextView
                 android:id="@+id/tvHint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="💡 Mật khẩu mặc định = MSSV. Bấm 'Gửi OTP' trước khi đăng nhập."
+                android:text="💡 Đã điền sẵn tài khoản mẫu để bạn test nhanh."
                 android:textSize="12sp"
                 android:textColor="@color/text_hint"
                 android:gravity="center"
-                android:layout_marginTop="14dp"/>
-
+                android:layout_marginTop="20dp"/>
         </LinearLayout>
 
-        <!-- Bottom padding -->
-        <View android:layout_width="match_parent" android:layout_height="32dp"/>
-
+        <View android:layout_width="match_parent" android:layout_height="40dp"/>
     </LinearLayout>
 </ScrollView>
