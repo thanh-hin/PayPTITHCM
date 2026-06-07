@@ -9,7 +9,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
     // 10.0.2.2 = localhost của máy host khi chạy từ Android Emulator
-    private static final String BASE_URL = "http://10.0.2.2:3000/";
+    //private static final String BASE_URL = "http://10.0.2.2:3000/";
+    private static final String BASE_URL = "http://192.168.3.234:3000/";
 
     private static Retrofit instance;
 

@@ -29,9 +29,10 @@ public class LoginActivity extends AppCompatActivity {
     private static final int RC_GOOGLE_SIGN_IN = 1001;
 
     EditText etIdentifier, etPassword, etTotp;
-    Button btnSendOtp, btnLogin;
-    View btnGoogleLogin; // Đổi từ Button sang View để tránh crash
-    TextView tvHint, tvGeneratedOtp;
+    TextView btnSendOtp; // Changed from Button to TextView to match XML
+    Button btnLogin;
+    View btnGoogleLogin;
+    TextView tvGeneratedOtp; // Removed tvHint as it doesn't exist in the layout
     SharedPrefs prefs;
     GoogleSignInClient googleSignInClient;
     String currentOtp = "";
@@ -56,8 +57,7 @@ public class LoginActivity extends AppCompatActivity {
         etTotp = findViewById(R.id.etTotp);
         btnSendOtp = findViewById(R.id.btnSendOtp);
         btnLogin = findViewById(R.id.btnLogin);
-        btnGoogleLogin = findViewById(R.id.btnGoogleLogin); // Ánh xạ CardView thành View
-        tvHint = findViewById(R.id.tvHint);
+        btnGoogleLogin = findViewById(R.id.btnGoogleLogin);
         tvGeneratedOtp = findViewById(R.id.tvGeneratedOtp);
 
         if (etIdentifier != null) {

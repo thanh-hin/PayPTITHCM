@@ -1,0 +1,19 @@
+{
+  "name": "payptithcm",
+  "version": "1.0.0",
+  "description": "> **Đồ án môn học** – Ứng dụng quản lý và thanh toán học phí dành cho sinh viên Học viện Công nghệ Bưu chính Viễn thông TP.HCM (PTITHCM)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.17.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  }
+}

@@ -1,5 +1,8 @@
 const express = require("express")
+const axios = require("axios")
+const crypto = require("crypto")
 const cors = require("cors")
+require("dotenv").config()
 
 const app = express()
 
@@ -8,261 +11,126 @@ app.use(express.json())
 
 const orders = {}
 
-app.post("/momo/create-payment", (req, res) => {
-    const studentId = req.body.studentId || "21520001"
-    const amount = Number(req.body.amount || 0)
-    const orderInfo = req.body.orderInfo || "Thanh toan hoc phi PayPTITHCM"
+app.post("/momo/create-payment", async (req, res) => {
+  try {
+    const amount = String(req.body.amount || 10000)
+    const orderInfo = req.body.orderInfo || "Thanh toan PayPTITHCM"
+    const userEmail = req.body.email || ""
+    const orderId = "PAYPTIT_" + Date.now()
+    const requestId = orderId
+    const extraData = Buffer.from(JSON.stringify({ userEmail })).toString("base64")
+    const requestType = "captureWallet"
 
-    if (amount <= 0) {
-        return res.status(400).json({
-            success: false,
-            message: "Amount khong hop le"
-        })
+    const partnerCode = process.env.MOMO_PARTNER_CODE
+    const accessKey = process.env.MOMO_ACCESS_KEY
+    const secretKey = process.env.MOMO_SECRET_KEY
+    const redirectUrl = process.env.REDIRECT_URL
+    const ipnUrl = process.env.IPN_URL
+
+    const rawSignature =
+      "accessKey=" + accessKey +
+      "&amount=" + amount +
+      "&extraData=" + extraData +
+      "&ipnUrl=" + ipnUrl +
+      "&orderId=" + orderId +
+      "&orderInfo=" + orderInfo +
+      "&partnerCode=" + partnerCode +
+      "&redirectUrl=" + redirectUrl +
+      "&requestId=" + requestId +
+      "&requestType=" + requestType
+
+    const signature = crypto
+      .createHmac("sha256", secretKey)
+      .update(rawSignature)
+      .digest("hex")
+
+    const requestBody = {
+      partnerCode,
+      partnerName: "PayPTITHCM",
+      storeId: "PayPTITHCMStore",
+      requestId,
+      amount,
+      orderId,
+      orderInfo,
+      redirectUrl,
+      ipnUrl,
+      lang: "vi",
+      requestType,
+      autoCapture: true,
+      extraData,
+      signature
     }
 
-    const orderId = "PAYPTIT_" + Date.now()
-    const requestId = "REQ_" + Date.now()
-    const transId = "MOMO_SANDBOX_" + Date.now()
+    const momoResponse = await axios.post(process.env.MOMO_ENDPOINT, requestBody, {
+      headers: {
+        "Content-Type": "application/json"
+      },
+      timeout: 30000
+    })
 
     orders[orderId] = {
-        orderId,
-        requestId,
-        transId,
-        studentId,
-        amount,
-        orderInfo,
-        status: "PENDING",
-        resultCode: null,
-        message: "Dang cho thanh toan",
-        createdAt: new Date().toISOString()
-    }
-
-    const payUrl = "http://localhost:3000/momo/checkout?orderId=" + orderId
-
-    res.json({
-        success: true,
-        partnerCode: "MOMO_SANDBOX",
-        orderId,
-        requestId,
-        amount,
-        orderInfo,
-        payUrl,
-        deeplink: payUrl,
-        qrCodeUrl: payUrl,
-        resultCode: 0,
-        message: "Tao giao dich sandbox thanh cong"
-    })
-})
-
-app.get("/momo/checkout", (req, res) => {
-    const orderId = req.query.orderId
-    const order = orders[orderId]
-
-    if (!order) {
-        return res.send("<h2>Khong tim thay giao dich</h2>")
-    }
-
-    res.send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <title>MoMo Sandbox PayPTITHCM</title>
-            <style>
-                body {
-                    margin: 0;
-                    font-family: Arial, sans-serif;
-                    background: #a50064;
-                    color: #222;
-                }
-                .box {
-                    max-width: 420px;
-                    margin: 60px auto;
-                    background: white;
-                    border-radius: 18px;
-                    padding: 24px;
-                    box-shadow: 0 8px 22px rgba(0,0,0,0.2);
-                }
-                .logo {
-                    text-align: center;
-                    color: #a50064;
-                    font-size: 36px;
-                    font-weight: bold;
-                    margin-bottom: 4px;
-                }
-                .sub {
-                    text-align: center;
-                    color: #777;
-                    margin-bottom: 24px;
-                }
-                .row {
-                    margin: 12px 0;
-                }
-                .label {
-                    color: #777;
-                    font-size: 14px;
-                }
-                .value {
-                    font-size: 18px;
-                    font-weight: bold;
-                    margin-top: 4px;
-                }
-                .amount {
-                    color: #a50064;
-                    font-size: 28px;
-                    font-weight: bold;
-                }
-                button {
-                    width: 100%;
-                    padding: 14px;
-                    margin-top: 10px;
-                    border: none;
-                    border-radius: 8px;
-                    font-size: 16px;
-                    cursor: pointer;
-                }
-                .success {
-                    background: #a50064;
-                    color: white;
-                }
-                .failed {
-                    background: #eeeeee;
-                    color: #222;
-                }
-                .cancel {
-                    background: white;
-                    color: #a50064;
-                    border: 1px solid #a50064;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="box">
-                <div class="logo">MoMo</div>
-                <div class="sub">Sandbox giả lập</div>
-
-                <div class="row">
-                    <div class="label">Người nhận</div>
-                    <div class="value">PayPTITHCM</div>
-                </div>
-
-                <div class="row">
-                    <div class="label">Mã đơn hàng</div>
-                    <div class="value">${order.orderId}</div>
-                </div>
-
-                <div class="row">
-                    <div class="label">Nội dung</div>
-                    <div class="value">${order.orderInfo}</div>
-                </div>
-
-                <div class="row">
-                    <div class="label">Số tiền</div>
-                    <div class="amount">${order.amount.toLocaleString("vi-VN")} VNĐ</div>
-                </div>
-
-                <form method="POST" action="/momo/sandbox-result">
-                    <input type="hidden" name="orderId" value="${order.orderId}">
-                    <input type="hidden" name="status" value="SUCCESS">
-                    <button class="success" type="submit">Xác nhận thanh toán thành công</button>
-                </form>
-
-                <form method="POST" action="/momo/sandbox-result">
-                    <input type="hidden" name="orderId" value="${order.orderId}">
-                    <input type="hidden" name="status" value="FAILED">
-                    <button class="failed" type="submit">Giả lập thanh toán thất bại</button>
-                </form>
-
-                <form method="POST" action="/momo/sandbox-result">
-                    <input type="hidden" name="orderId" value="${order.orderId}">
-                    <input type="hidden" name="status" value="CANCELED">
-                    <button class="cancel" type="submit">Hủy thanh toán</button>
-                </form>
-            </div>
-        </body>
-        </html>
-    `)
-})
-
-app.post("/momo/sandbox-result", express.urlencoded({ extended: true }), (req, res) => {
-    const orderId = req.body.orderId
-    const status = req.body.status
-    const order = orders[orderId]
-
-    if (!order) {
-        return res.send("<h2>Khong tim thay giao dich</h2>")
-    }
-
-    if (status === "SUCCESS") {
-        order.status = "PAID"
-        order.resultCode = 0
-        order.message = "Thanh toan thanh cong"
-    } else if (status === "FAILED") {
-        order.status = "FAILED"
-        order.resultCode = 1006
-        order.message = "Thanh toan that bai"
-    } else {
-        order.status = "CANCELED"
-        order.resultCode = 1001
-        order.message = "Nguoi dung huy thanh toan"
-    }
-
-    order.paidAt = new Date().toISOString()
-
-    res.send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <title>Payment Result</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    background: #f5f5f5;
-                    padding: 40px;
-                    text-align: center;
-                }
-                .box {
-                    background: white;
-                    max-width: 420px;
-                    margin: auto;
-                    padding: 24px;
-                    border-radius: 16px;
-                }
-                h2 {
-                    color: #a50064;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="box">
-                <h2>${order.message}</h2>
-                <p>Mã đơn hàng: <b>${order.orderId}</b></p>
-                <p>Mã giao dịch: <b>${order.transId}</b></p>
-                <p>Bạn có thể quay lại ứng dụng PayPTITHCM.</p>
-            </div>
-        </body>
-        </html>
-    `)
-})
-
-app.get("/momo/status/:orderId", (req, res) => {
-    const orderId = req.params.orderId
-    const order = orders[orderId]
-
-    if (!order) {
-        return res.status(404).json({
-            success: false,
-            message: "Khong tim thay don hang"
-        })
+      orderId,
+      amount,
+      userEmail,
+      status: "PENDING",
+      momoResponse: momoResponse.data
     }
 
     res.json({
-        success: true,
-        order
+      success: true,
+      orderId,
+      payUrl: momoResponse.data.payUrl,
+      deeplink: momoResponse.data.deeplink,
+      qrCodeUrl: momoResponse.data.qrCodeUrl,
+      resultCode: momoResponse.data.resultCode,
+      message: momoResponse.data.message
     })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Create MoMo payment failed",
+      error: error.response?.data || error.message
+    })
+  }
 })
 
-app.listen(3000, () => {
-    console.log("MoMo sandbox backend running at http://localhost:3000")
+app.post("/momo/ipn", (req, res) => {
+  const data = req.body
+  const orderId = data.orderId
+
+  if (orders[orderId]) {
+    orders[orderId].status = data.resultCode === 0 ? "PAID" : "FAILED"
+    orders[orderId].ipn = data
+  }
+
+  res.status(204).send()
+})
+
+app.get("/momo/return", (req, res) => {
+  res.send(`
+    <h2>MoMo Payment Return</h2>
+    <p>OrderId: ${req.query.orderId || ""}</p>
+    <p>ResultCode: ${req.query.resultCode || ""}</p>
+    <p>Message: ${req.query.message || ""}</p>
+  `)
+})
+
+app.get("/momo/order/:orderId", (req, res) => {
+  const order = orders[req.params.orderId]
+
+  if (!order) {
+    return res.status(404).json({
+      success: false,
+      message: "Order not found"
+    })
+  }
+
+  res.json({
+    success: true,
+    order
+  })
+})
+
+app.listen(process.env.PORT, () => {
+  console.log("MoMo backend running on port " + process.env.PORT)
 })

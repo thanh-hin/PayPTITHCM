@@ -9,6 +9,9 @@ import com.ptithcm.payptithcm.network.models.OtpRequest;
 import com.ptithcm.payptithcm.network.models.PaymentRequest;
 import com.ptithcm.payptithcm.network.models.PaymentsResponse;
 import com.ptithcm.payptithcm.network.models.StudentResponse;
+import com.ptithcm.payptithcm.network.models.MomoPaymentRequest;
+import com.ptithcm.payptithcm.network.models.MomoPaymentResponse;
+import com.ptithcm.payptithcm.network.models.MomoOrderResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -47,4 +50,10 @@ public interface ApiService {
 
     @GET("api/contact")
     Call<ContactResponse> getContact();
+
+    @POST("momo/create-payment")
+    Call<MomoPaymentResponse> createMomoPayment(@Body MomoPaymentRequest request);
+
+    @GET("momo/order/{orderId}")
+    Call<MomoOrderResponse> getMomoOrderStatus(@Path("orderId") String orderId);
 }
