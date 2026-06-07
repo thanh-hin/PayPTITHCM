@@ -13,13 +13,19 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.ptithcm.payptithcm.network.ApiClient;
+import com.ptithcm.payptithcm.network.models.ContactResponse;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class SupportFragment extends Fragment {
 
     TextView tvPhone, tvEmail, tvAddress, tvHours, tvFax, tvWebsite;
     Button btnCall, btnEmail;
-
-    private static final String PHONE   = "0901234567";
-    private static final String EMAIL   = "hotro@ptithcm.edu.vn";
+    String rawPhone = "0901234567";
+    String rawEmail = "hotro@ptithcm.edu.vn";
 
     @Nullable
     @Override
@@ -36,25 +42,60 @@ public class SupportFragment extends Fragment {
         btnCall   = view.findViewById(R.id.btnCall);
         btnEmail  = view.findViewById(R.id.btnEmailSupport);
 
-        tvPhone.setText("090 123 4567");
-        tvEmail.setText(EMAIL);
-        tvAddress.setText("122 Hoàng Diệu 2, Thủ Đức, TP. Hồ Chí Minh");
-        tvHours.setText("Thứ 2 - Thứ 6: 07:30 - 17:00");
-        tvFax.setText("(028) 3897 0601");
-        tvWebsite.setText("www.ptithcm.edu.vn");
+        // Hiển thị thông tin mặc định ngay (offline fallback)
+        setDefaultContact();
+
+        // Thử lấy thông tin từ API
+        loadContact();
 
         btnCall.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + PHONE));
+            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + rawPhone));
             startActivity(intent);
         });
 
         btnEmail.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_SENDTO);
-            intent.setData(Uri.parse("mailto:" + EMAIL));
+            intent.setData(Uri.parse("mailto:" + rawEmail));
             intent.putExtra(Intent.EXTRA_SUBJECT, "Hỗ trợ thanh toán học phí");
             startActivity(Intent.createChooser(intent, "Gửi email"));
         });
 
         return view;
+    }
+
+    private void setDefaultContact() {
+        rawPhone = "0901234567";
+        rawEmail = "hotro@ptithcm.edu.vn";
+        if (tvPhone   != null) tvPhone.setText("090 123 4567");
+        if (tvEmail   != null) tvEmail.setText(rawEmail);
+        if (tvAddress != null) tvAddress.setText("122 Hoàng Diệu 2, Thủ Đức, TP. Hồ Chí Minh");
+        if (tvHours   != null) tvHours.setText("Thứ 2 - Thứ 6: 07:30 - 17:00");
+        if (tvFax     != null) tvFax.setText("(028) 3897 0601");
+        if (tvWebsite != null) tvWebsite.setText("www.ptithcm.edu.vn");
+    }
+
+    private void loadContact() {
+        ApiClient.getService().getContact().enqueue(new Callback<ContactResponse>() {
+            @Override
+            public void onResponse(Call<ContactResponse> call, Response<ContactResponse> response) {
+                if (getContext() == null) return;
+                if (response.isSuccessful() && response.body() != null && response.body().success) {
+                    ContactResponse.ContactData c = response.body().contact;
+                    rawPhone = c.phone;
+                    rawEmail = c.email;
+                    if (tvPhone   != null) tvPhone.setText(c.phoneDisplay != null ? c.phoneDisplay : c.phone);
+                    if (tvEmail   != null) tvEmail.setText(c.email);
+                    if (tvAddress != null) tvAddress.setText(c.address);
+                    if (tvHours   != null) tvHours.setText(c.hours);
+                    if (tvFax     != null) tvFax.setText(c.fax != null ? c.fax : "");
+                    if (tvWebsite != null) tvWebsite.setText(c.website != null ? c.website.replace("https://", "") : "");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ContactResponse> call, Throwable t) {
+                // Giữ thông tin mặc định
+            }
+        });
     }
 }

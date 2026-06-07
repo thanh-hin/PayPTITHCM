@@ -155,6 +155,30 @@
 
         </androidx.cardview.widget.CardView>
 
+        <!-- CHART SECTION -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thống kê đóng học phí"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#212121"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="12dp" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="3dp">
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/lineChart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp" />
+        </androidx.cardview.widget.CardView>
+
         <!-- TITLE -->
         <TextView
             android:layout_width="wrap_content"
@@ -163,17 +187,17 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="#212121"
-            android:layout_marginTop="18dp"
-            android:layout_marginBottom="10dp" />
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="12dp" />
 
         <!-- GRID -->
         <GridView
             android:id="@+id/gvHome"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="500dp"
             android:numColumns="2"
-            android:horizontalSpacing="10dp"
-            android:verticalSpacing="10dp"
+            android:horizontalSpacing="12dp"
+            android:verticalSpacing="12dp"
             android:stretchMode="columnWidth"
             android:scrollbars="none" />
 

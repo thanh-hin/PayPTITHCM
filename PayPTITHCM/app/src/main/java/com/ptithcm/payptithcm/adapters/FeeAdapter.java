@@ -1,13 +1,14 @@
 package com.ptithcm.payptithcm.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
 
 import com.ptithcm.payptithcm.R;
 import com.ptithcm.payptithcm.models.FeeItem;
@@ -30,9 +31,8 @@ public class FeeAdapter extends BaseAdapter {
     @Override public long getItemId(int position)      { return feeList.get(position).getId(); }
     @Override public boolean hasStableIds()            { return true; }
 
-    // ViewHolder de tranh goi findViewById moi lan scroll
     static class ViewHolder {
-        TextView tvName, tvAmount, tvStatus, tvDeadline;
+        TextView tvName, tvSemesterInfo, tvAmount, tvStatus, tvDeadline;
         CheckBox cbSelect;
     }
 
@@ -43,11 +43,12 @@ public class FeeAdapter extends BaseAdapter {
         if (convertView == null) {
             convertView = LayoutInflater.from(context).inflate(R.layout.item_fee, parent, false);
             holder = new ViewHolder();
-            holder.tvName     = convertView.findViewById(R.id.tvFeeName);
-            holder.tvAmount   = convertView.findViewById(R.id.tvAmount);
-            holder.tvStatus   = convertView.findViewById(R.id.tvStatus);
-            holder.tvDeadline = convertView.findViewById(R.id.tvDeadline);
-            holder.cbSelect   = convertView.findViewById(R.id.cbSelect);
+            holder.tvName         = convertView.findViewById(R.id.tvFeeName);
+            holder.tvSemesterInfo = convertView.findViewById(R.id.tvSemesterInfo);
+            holder.tvAmount       = convertView.findViewById(R.id.tvAmount);
+            holder.tvStatus       = convertView.findViewById(R.id.tvStatus);
+            holder.tvDeadline     = convertView.findViewById(R.id.tvDeadline);
+            holder.cbSelect       = convertView.findViewById(R.id.cbSelect);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -56,46 +57,53 @@ public class FeeAdapter extends BaseAdapter {
         FeeItem item = feeList.get(position);
 
         holder.tvName.setText(item.getName());
-        holder.tvAmount.setText(String.format("%,d đ", item.getAmount()));
-        holder.tvDeadline.setText("Hạn: " + formatDate(item.getDeadline()));
+        
+        // Hiển thị Học kì và Năm học
+        if (item.getSchoolYear() != null && !item.getSchoolYear().isEmpty()) {
+            holder.tvSemesterInfo.setText(String.format("Học kỳ %s - Năm học %s", item.getSemester(), item.getSchoolYear()));
+            holder.tvSemesterInfo.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvSemesterInfo.setVisibility(View.GONE);
+        }
 
-        // Mau sac theo trang thai
+        holder.tvAmount.setText(String.format("%,d đ", item.getAmount()));
+        holder.tvDeadline.setText("Hạn đóng: " + formatDate(item.getDeadline()));
+
         String status = item.getStatus();
         if ("PAID".equals(status)) {
-            holder.tvStatus.setText("✓ Đã đóng");
-            holder.tvStatus.setTextColor(Color.parseColor("#16A34A"));
+            holder.tvStatus.setText("✓ Đã thanh toán");
+            holder.tvStatus.setTextColor(ContextCompat.getColor(context, R.color.status_paid));
             holder.tvStatus.setBackgroundResource(R.drawable.bg_status_paid);
             holder.cbSelect.setEnabled(false);
             holder.cbSelect.setChecked(false);
-            convertView.setAlpha(0.65f);
+            holder.cbSelect.setVisibility(View.GONE);
+            convertView.setAlpha(0.7f);
         } else if ("OVERDUE".equals(status)) {
-            holder.tvStatus.setText("⚠ Quá hạn!");
-            holder.tvStatus.setTextColor(Color.parseColor("#D97706"));
+            holder.tvStatus.setText("⚠ Quá hạn");
+            holder.tvStatus.setTextColor(ContextCompat.getColor(context, R.color.status_overdue));
             holder.tvStatus.setBackgroundResource(R.drawable.bg_status_overdue);
             holder.cbSelect.setEnabled(true);
+            holder.cbSelect.setVisibility(View.VISIBLE);
             convertView.setAlpha(1.0f);
         } else {
-            holder.tvStatus.setText("Chưa đóng");
-            holder.tvStatus.setTextColor(Color.parseColor("#CE0707"));
+            holder.tvStatus.setText("Chưa thanh toán");
+            holder.tvStatus.setTextColor(ContextCompat.getColor(context, R.color.status_unpaid));
             holder.tvStatus.setBackgroundResource(R.drawable.bg_status_unpaid);
             holder.cbSelect.setEnabled(true);
+            holder.cbSelect.setVisibility(View.VISIBLE);
             convertView.setAlpha(1.0f);
         }
 
-        // Reset listener truoc khi setChecked tranh callback sai khi recycle
         holder.cbSelect.setOnCheckedChangeListener(null);
         holder.cbSelect.setChecked(item.isSelected());
 
-        final int pos = position;
         holder.cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
             item.setSelected(isChecked);
             if (onSelectionChanged != null) onSelectionChanged.run();
         });
 
-        // Click toan bo dong cung toggle checkbox
-        final View finalView = convertView;
-        finalView.setOnClickListener(v -> {
-            if (holder.cbSelect.isEnabled()) {
+        convertView.setOnClickListener(v -> {
+            if (holder.cbSelect.isEnabled() && holder.cbSelect.getVisibility() == View.VISIBLE) {
                 holder.cbSelect.setChecked(!holder.cbSelect.isChecked());
             }
         });
@@ -104,8 +112,9 @@ public class FeeAdapter extends BaseAdapter {
     }
 
     private String formatDate(String raw) {
-        if (raw == null || raw.length() < 10) return raw != null ? raw : "";
+        if (raw == null || raw.length() < 10) return raw != null ? raw : "N/A";
         try {
+            // raw format: YYYY-MM-DD...
             String[] parts = raw.substring(0, 10).split("-");
             if (parts.length == 3) return parts[2] + "/" + parts[1] + "/" + parts[0];
         } catch (Exception ignored) {}

@@ -1,144 +1,269 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:background="@color/bg_gray">
+    android:background="@color/white"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- ===== HEADER GRADIENT ===== -->
-        <LinearLayout
+        <!-- Banner Đỏ chuẩn PTIT (Solid Red) -->
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="220dp"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:background="@drawable/bg_login_header"
-            android:paddingTop="40dp"
-            android:paddingBottom="24dp">
+            android:background="@color/ptit_red">
 
-            <ImageView
-                android:id="@+id/imgLogo"
-                android:layout_width="90dp"
-                android:layout_height="90dp"
-                android:src="@drawable/logo_ptit"
-                android:scaleType="fitCenter"
-                android:background="@drawable/bg_icon_circle"
-                android:padding="10dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="PAY PTITHCM"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:letterSpacing="0.08"
-                android:layout_marginTop="12dp"/>
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingBottom="20dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Cổng thanh toán học phí sinh viên"
-                android:textSize="13sp"
-                android:textColor="#FFD6D6"
-                android:layout_marginTop="4dp"/>
-        </LinearLayout>
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="86dp"
+                    android:layout_height="86dp"
+                    app:cardCornerRadius="43dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="2dp"
+                    app:strokeColor="@color/white"
+                    app:cardBackgroundColor="@android:color/transparent">
 
-        <!-- ===== FORM CARD ===== -->
-        <LinearLayout
+                    <ImageView
+                        android:id="@+id/imgLogo"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="14dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/logo_ptit" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="PAY PTITHCM"
+                    android:textColor="@color/white"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Form Đăng nhập Trắng Tinh Khôi -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginTop="-24dp"
-            android:padding="24dp"
-            android:elevation="8dp">
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginTop="-35dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
+            app:strokeWidth="0dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Đăng nhập"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_main"
-                android:layout_marginBottom="20dp"/>
-
-            <!-- MSSV hoặc Email -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="MSSV hoặc Email"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_sub"
-                android:layout_marginBottom="6dp"/>
-            <EditText
-                android:id="@+id/etMSSV"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:hint="Nhập MSSV hoặc địa chỉ Email"
-                android:textSize="14sp"
-                android:paddingHorizontal="16dp"
-                android:background="@drawable/bg_input"
-                android:layout_marginBottom="16dp"
-                android:inputType="textEmailAddress"
-                android:textColor="@color/text_main"
-                android:textColorHint="@color/text_hint"/>
-
-            <!-- Mật khẩu -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Mật khẩu"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_sub"
-                android:layout_marginBottom="6dp"/>
-            <EditText
-                android:id="@+id/etPassword"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:hint="Nhập mật khẩu"
-                android:textSize="15sp"
-                android:paddingHorizontal="16dp"
-                android:background="@drawable/bg_input"
-                android:layout_marginBottom="24dp"
-                android:inputType="textPassword"
-                android:textColor="@color/text_main"
-                android:textColorHint="@color/text_hint"/>
-
-            <!-- Login Button -->
-            <Button
-                android:id="@+id/btnLogin"
-                android:layout_width="match_parent"
-                android:layout_height="54dp"
-                android:text="Đăng nhập"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:background="@drawable/bg_button_primary"
-                android:stateListAnimator="@null"/>
-
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="💡 Mật khẩu mặc định = MSSV của bạn."
-                android:textSize="12sp"
-                android:textColor="@color/text_hint"
-                android:gravity="center"
-                android:layout_marginTop="14dp"/>
+                android:orientation="vertical"
+                android:padding="28dp">
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Đăng nhập"
+                    android:textColor="@color/text_main"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="24dp"/>
 
-        <!-- Bottom padding -->
-        <View android:layout_width="match_parent" android:layout_height="32dp"/>
+                <!-- MSSV Field -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:hint="Mã số sinh viên"
+                    app:boxStrokeColor="@color/ptit_red"
+                    app:hintTextColor="@color/ptit_red"
+                    app:startIconDrawable="@drawable/ic_nav_profile"
+                    app:startIconTint="@color/ptit_red"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp">
 
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etMSSV"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:textColor="@color/text_main" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Password Field -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:hint="Mật khẩu"
+                    app:boxStrokeColor="@color/ptit_red"
+                    app:hintTextColor="@color/ptit_red"
+                    app:passwordToggleEnabled="true"
+                    app:startIconDrawable="@drawable/ic_history"
+                    app:startIconTint="@color/ptit_red"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:textColor="@color/text_main" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- OTP Area (Trắng viền Đỏ mảnh) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/ptit_red">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="MÃ OTP XÁC THỰC"
+                            android:textColor="@color/ptit_red"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+                        <TextView
+                            android:id="@+id/tvGeneratedOtp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="------"
+                            android:textColor="@color/ptit_red"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.2" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSendOtp"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="LẤY MÃ OTP NGAY"
+                    android:textColor="@color/ptit_red"
+                    android:textStyle="bold" />
+
+                <!-- OTP Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    android:hint="Nhập mã 6 số"
+                    app:boxStrokeColor="@color/ptit_red"
+                    app:hintTextColor="@color/ptit_red"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etTotp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:inputType="number"
+                        android:letterSpacing="0.3"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_main" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Login Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnLogin"
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp"
+                    android:text="ĐĂNG NHẬP"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/ptit_red"
+                    app:cornerRadius="14dp"
+                    app:elevation="4dp"
+                    android:textColor="@color/white" />
+
+                <!-- Social Login Section (Google Icon) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:layout_marginTop="32dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hoặc tiếp tục với"
+                        android:textColor="@color/text_sub"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="16dp"/>
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/btnGoogleLogin"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="26dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="#EEEEEE"
+                        app:rippleColor="#15000000">
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:padding="12dp"
+                            android:src="@drawable/ic_gg" />
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:gravity="center"
+                    android:text="💡 Đăng nhập bằng tài khoản sinh viên được cấp"
+                    android:textColor="@color/text_hint"
+                    android:textSize="11sp" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="40dp" />
     </LinearLayout>
 </ScrollView>

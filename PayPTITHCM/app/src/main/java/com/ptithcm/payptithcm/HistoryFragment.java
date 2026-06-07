@@ -41,7 +41,11 @@ public class HistoryFragment extends Fragment {
 
     private void loadHistory() {
         if (getContext() == null) return;
-        String mssv = new SharedPrefs(getContext()).getUser();
+        
+        SharedPrefs prefs = new SharedPrefs(getContext());
+        String mssv = prefs.getUser();
+        if (mssv.isEmpty()) mssv = "21520001"; // Đảm bảo lấy được dữ liệu mẫu
+
         List<HistoryItem> historyList = DatabaseHelper.getInstance(getContext()).getPaymentHistory(mssv);
 
         if (historyList.isEmpty()) {
@@ -57,7 +61,6 @@ public class HistoryFragment extends Fragment {
         }
     }
 
-    /** Hiển thị dialog chi tiết giao dịch khi click vào item */
     private void showDetailDialog(HistoryItem item) {
         if (getContext() == null) return;
         String status = "SUCCESS".equals(item.getStatus()) ? "✓ Thành công" : "✗ Thất bại";
@@ -88,4 +91,3 @@ public class HistoryFragment extends Fragment {
         return raw;
     }
 }
-

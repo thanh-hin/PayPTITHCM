@@ -4,9 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 public class SharedPrefs {
-    private static final String PREF_NAME    = "TuitionPrefs";
-    private static final String KEY_MSSV     = "MSSV";
+    private static final String PREF_NAME   = "TuitionPrefs";
+    private static final String KEY_MSSV    = "MSSV";
     private static final String KEY_LOGGED_IN = "isLoggedIn";
+    private static final String KEY_TOKEN   = "TOKEN";
+    private static final String KEY_EMAIL   = "EMAIL";
 
     private final SharedPreferences sharedPreferences;
 
@@ -14,7 +16,6 @@ public class SharedPrefs {
         sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
-    /** Lưu session sau khi đăng nhập thành công */
     public void saveUser(String mssv) {
         sharedPreferences.edit()
                 .putString(KEY_MSSV, mssv)
@@ -22,18 +23,42 @@ public class SharedPrefs {
                 .apply();
     }
 
-    /** Lấy MSSV đang đăng nhập */
+    public void saveSession(String mssv, String token, String email) {
+        sharedPreferences.edit()
+                .putString(KEY_MSSV, mssv)
+                .putString(KEY_TOKEN, token)
+                .putString(KEY_EMAIL, email)
+                .putBoolean(KEY_LOGGED_IN, true)
+                .apply();
+    }
+
     public String getUser() {
         return sharedPreferences.getString(KEY_MSSV, "");
     }
 
-    /** Kiểm tra đã đăng nhập chưa */
+    public String getToken() {
+        return sharedPreferences.getString(KEY_TOKEN, "");
+    }
+
+    public String getEmail() {
+        return sharedPreferences.getString(KEY_EMAIL, "");
+    }
+
+    /** Trả về "Bearer <token>" cho Retrofit header */
+    public String getBearerToken() {
+        String token = getToken();
+        return token.isEmpty() ? "" : "Bearer " + token;
+    }
+
     public boolean isLoggedIn() {
         return sharedPreferences.getBoolean(KEY_LOGGED_IN, false)
                 && !getUser().isEmpty();
     }
 
-    /** Xoá toàn bộ session (đăng xuất) */
+    public boolean hasToken() {
+        return !getToken().isEmpty();
+    }
+
     public void clearUser() {
         sharedPreferences.edit().clear().apply();
     }
