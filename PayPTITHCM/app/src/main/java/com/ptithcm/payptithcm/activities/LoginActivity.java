@@ -32,7 +32,7 @@ public class LoginActivity extends AppCompatActivity {
     TextView btnSendOtp; // Changed from Button to TextView to match XML
     Button btnLogin;
     View btnGoogleLogin;
-    TextView tvGeneratedOtp; // Removed tvHint as it doesn't exist in the layout
+    TextView tvGeneratedOtp;
     SharedPrefs prefs;
     GoogleSignInClient googleSignInClient;
     String currentOtp = "";

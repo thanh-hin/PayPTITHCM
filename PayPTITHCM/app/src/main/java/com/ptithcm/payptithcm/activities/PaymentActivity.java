@@ -2,71 +2,65 @@ package com.ptithcm.payptithcm.activities;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.button.MaterialButton;
 import com.ptithcm.payptithcm.R;
 import com.ptithcm.payptithcm.models.FeeItem;
+import com.ptithcm.payptithcm.network.VnpayApiClient;
+import com.ptithcm.payptithcm.network.models.VnpayCreateRequest;
+import com.ptithcm.payptithcm.network.models.VnpayCreateResponse;
+import com.ptithcm.payptithcm.network.models.VnpayStatusResponse;
 import com.ptithcm.payptithcm.utils.DatabaseHelper;
 import com.ptithcm.payptithcm.utils.SharedPrefs;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class PaymentActivity extends AppCompatActivity {
     TextView tvFeeDetail, tvTotalAmount;
     RadioGroup rgMethod;
-    Button btnConfirm, btnCancel;
+    MaterialButton btnConfirm, btnCancel;
 
     long totalAmount;
     String feeDetail;
     ArrayList<Integer> selectedIds;
     boolean isProcessing = false;
 
-    // Launcher cho MoMo
-    private final ActivityResultLauncher<Intent> momoLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == RESULT_OK) {
-                    // MoMo thành công → lưu vào DB
-                    String mssv = new SharedPrefs(this).getUser();
-                    finishPayment(mssv, "Ví điện tử (MoMo)");
-                } else {
-                    isProcessing = false;
-                    btnConfirm.setEnabled(true);
-                }
-            });
-
-    // Launcher cho QR ngân hàng
-    private final ActivityResultLauncher<Intent> bankQRLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == RESULT_OK) {
-                    String mssv = new SharedPrefs(this).getUser();
-                    finishPayment(mssv, "Chuyển khoản ngân hàng");
-                } else {
-                    isProcessing = false;
-                    btnConfirm.setEnabled(true);
-                }
-            });
+    private String currentVnpayTxnRef = null;
+    private boolean waitingVnpayResult = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment);
 
+        initViews();
+        loadData();
+    }
+
+    private void initViews() {
         tvFeeDetail   = findViewById(R.id.tvFeeDetail);
         tvTotalAmount = findViewById(R.id.tvTotalAmount);
         rgMethod      = findViewById(R.id.rgMethod);
         btnConfirm    = findViewById(R.id.btnConfirm);
         btnCancel     = findViewById(R.id.btnCancel);
 
+        btnCancel.setOnClickListener(v -> finish());
+        btnConfirm.setOnClickListener(v -> confirmPayment());
+    }
+
+    private void loadData() {
         Bundle bundle = getIntent().getBundleExtra("data");
         if (bundle != null) {
             totalAmount = bundle.getLong("TOTAL_AMOUNT", 0);
@@ -80,14 +74,16 @@ public class PaymentActivity extends AppCompatActivity {
             return;
         }
 
-        tvFeeDetail.setText(feeDetail != null && !feeDetail.isEmpty() ? feeDetail : "Không có thông tin");
-        tvTotalAmount.setText(String.format("Tổng cộng: %,d đ", totalAmount));
+        tvFeeDetail.setText(feeDetail != null && !feeDetail.isEmpty() ? feeDetail : "Không có nội dung thanh toán");
+        tvTotalAmount.setText(String.format("%,d đ", totalAmount));
+    }
 
-        RadioButton rbFirst = (RadioButton) rgMethod.getChildAt(0);
-        if (rbFirst != null) rbFirst.setChecked(true);
-
-        btnCancel.setOnClickListener(v -> finish());
-        btnConfirm.setOnClickListener(v -> confirmPayment());
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (waitingVnpayResult && currentVnpayTxnRef != null) {
+            checkVnpayStatus();
+        }
     }
 
     private void confirmPayment() {
@@ -99,56 +95,88 @@ public class PaymentActivity extends AppCompatActivity {
             return;
         }
 
-        RadioButton rbSelected = findViewById(checkedId);
-        String rawText = rbSelected.getText().toString().trim();
-        String method = rawText.replaceAll("^[^\\p{L}]+", "").trim();
-        if (method.isEmpty()) method = rawText;
-
-        final String finalMethod = method;
+        String methodName = (checkedId == R.id.rbVnpay) ? "VNPAY" : "Tại quầy";
 
         new AlertDialog.Builder(this)
-                .setTitle("Xác nhận thanh toán")
-                .setMessage("Số tiền: " + String.format("%,d đ", totalAmount)
-                        + "\nPhương thức: " + method
-                        + "\n\nBạn có chắc chắn muốn thanh toán không?")
-                .setPositiveButton("Xác nhận", (dialog, which) -> doPayment(finalMethod))
-                .setNegativeButton("Huỷ", null)
+                .setTitle("Xác nhận")
+                .setMessage("Thanh toán " + String.format("%,d đ", totalAmount) + " bằng " + methodName + "?")
+                .setPositiveButton("Tiếp tục", (dialog, which) -> doPayment(checkedId, methodName))
+                .setNegativeButton("Hủy", null)
                 .show();
     }
 
-    private void doPayment(String method) {
-        if (isProcessing) return;
+    private void doPayment(int checkedId, String method) {
         isProcessing = true;
         btnConfirm.setEnabled(false);
+        btnConfirm.setText("ĐANG XỬ LÝ...");
 
-        String mssv = new SharedPrefs(this).getUser();
-
-        // Route theo phương thức
-        if (method.contains("MoMo") || method.contains("Ví") || method.contains("điện tử")) {
-            // Chuyển sang màn MoMo
-            Intent intent = new Intent(this, MomoPaymentActivity.class);
-            intent.putExtra("TOTAL_AMOUNT", totalAmount);
-            intent.putExtra("FEE_DETAIL", feeDetail);
-            momoLauncher.launch(intent);
-
-        } else if (method.contains("Chuyển khoản") || method.contains("ngân hàng")) {
-            // Chuyển sang màn QR
-            Intent intent = new Intent(this, BankQRActivity.class);
-            intent.putExtra("TOTAL_AMOUNT", totalAmount);
-            intent.putExtra("MSSV", mssv);
-            intent.putExtra("FEE_DETAIL", feeDetail);
-            bankQRLauncher.launch(intent);
-
+        if (checkedId == R.id.rbVnpay) {
+            startVnpayPayment();
         } else {
-            // Tiền mặt: xử lý trực tiếp
-            finishPayment(mssv, method);
+            finishPayment(new SharedPrefs(this).getUser(), method);
         }
+    }
+
+    private void startVnpayPayment() {
+        String mssv = new SharedPrefs(this).getUser();
+        VnpayCreateRequest request = new VnpayCreateRequest(mssv, selectedIds, totalAmount);
+
+        VnpayApiClient.getService()
+                .createVnpayPayment(request)
+                .enqueue(new Callback<VnpayCreateResponse>() {
+                    @Override
+                    public void onResponse(Call<VnpayCreateResponse> call, Response<VnpayCreateResponse> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().success) {
+                            currentVnpayTxnRef = response.body().transactionId;
+                            waitingVnpayResult = true;
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(response.body().paymentUrl)));
+                        } else {
+                            resetProcessingState();
+                            Toast.makeText(PaymentActivity.this, "Lỗi khởi tạo thanh toán", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<VnpayCreateResponse> call, Throwable t) {
+                        resetProcessingState();
+                        Toast.makeText(PaymentActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void checkVnpayStatus() {
+        VnpayApiClient.getService()
+                .getVnpayStatus(currentVnpayTxnRef)
+                .enqueue(new Callback<VnpayStatusResponse>() {
+                    @Override
+                    public void onResponse(Call<VnpayStatusResponse> call, Response<VnpayStatusResponse> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().success) {
+                            if ("SUCCESS".equals(response.body().status)) {
+                                waitingVnpayResult = false;
+                                finishPayment(new SharedPrefs(PaymentActivity.this).getUser(), "VNPAY");
+                            } else if ("FAILED".equals(response.body().status)) {
+                                waitingVnpayResult = false;
+                                resetProcessingState();
+                                Toast.makeText(PaymentActivity.this, "Thanh toán thất bại", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<VnpayStatusResponse> call, Throwable t) {}
+                });
+    }
+
+    private void resetProcessingState() {
+        isProcessing = false;
+        btnConfirm.setEnabled(true);
+        btnConfirm.setText("XÁC NHẬN");
     }
 
     private void finishPayment(String mssv, String method) {
         DatabaseHelper db = DatabaseHelper.getInstance(this);
         List<FeeItem> allFees = db.getStudentFees(mssv);
         List<FeeItem> toPayList = new ArrayList<>();
+
         if (selectedIds != null) {
             for (FeeItem fee : allFees) {
                 if (selectedIds.contains(fee.getId()) && !"PAID".equals(fee.getStatus())) {
@@ -158,10 +186,6 @@ public class PaymentActivity extends AppCompatActivity {
         }
 
         if (toPayList.isEmpty()) {
-            Toast.makeText(this, "Không tìm thấy khoản phí hợp lệ!", Toast.LENGTH_LONG).show();
-            isProcessing = false;
-            btnConfirm.setEnabled(true);
-            setResult(RESULT_OK);
             finish();
             return;
         }
@@ -169,20 +193,17 @@ public class PaymentActivity extends AppCompatActivity {
         String txnId = db.insertPayment(mssv, toPayList, method);
         if (txnId != null) {
             new AlertDialog.Builder(this)
-                    .setTitle("✓ Thanh toán thành công!")
-                    .setMessage("Mã giao dịch: " + txnId
-                            + "\nSố tiền: " + String.format("%,d đ", totalAmount)
-                            + "\nPhương thức: " + method)
-                    .setPositiveButton("OK", (dialog, which) -> {
+                    .setTitle("Thành công")
+                    .setMessage("Giao dịch hoàn tất!\nMã GD: " + txnId)
+                    .setPositiveButton("Xong", (dialog, which) -> {
                         setResult(RESULT_OK);
                         finish();
                     })
                     .setCancelable(false)
                     .show();
         } else {
-            isProcessing = false;
-            btnConfirm.setEnabled(true);
-            Toast.makeText(this, "Có lỗi khi lưu giao dịch! Vui lòng thử lại.", Toast.LENGTH_LONG).show();
+            resetProcessingState();
+            Toast.makeText(this, "Lỗi lưu dữ liệu!", Toast.LENGTH_LONG).show();
         }
     }
 }
