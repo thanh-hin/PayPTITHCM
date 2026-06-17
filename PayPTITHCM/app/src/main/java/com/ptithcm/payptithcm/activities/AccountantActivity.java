@@ -3,6 +3,8 @@ package com.ptithcm.payptithcm.activities;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -21,15 +23,19 @@ import com.ptithcm.payptithcm.adapters.AccountantFeeAdapter;
 import com.ptithcm.payptithcm.utils.DatabaseHelper;
 import com.ptithcm.payptithcm.utils.SharedPrefs;
 
+import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AccountantActivity extends AppCompatActivity {
     TextView tvSummary, tvNoticeSummary, tvTotalAmount;
+    EditText etSearchStudent;
     Spinner spinnerStatus;
     ListView lvFees;
     View tvEmpty;
@@ -37,10 +43,13 @@ public class AccountantActivity extends AppCompatActivity {
 
     List<DatabaseHelper.AccountantFeeRecord> allFees = new ArrayList<>();
     List<DatabaseHelper.AccountantFeeRecord> displayFees = new ArrayList<>();
+    List<StudentSearchRow> searchRows = new ArrayList<>();
     AccountantFeeAdapter adapter;
     SharedPrefs prefs;
 
     private String selectedStatus = "Chua dong";
+    private String searchQuery = "";
+    private String selectedSearchStudentId = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +65,7 @@ public class AccountantActivity extends AppCompatActivity {
         tvSummary = findViewById(R.id.tvSummary);
         tvNoticeSummary = findViewById(R.id.tvNoticeSummary);
         tvTotalAmount = findViewById(R.id.tvTotalAmount);
+        etSearchStudent = findViewById(R.id.etSearchStudent);
         spinnerStatus = findViewById(R.id.spinnerStatus);
         lvFees = findViewById(R.id.lvFees);
         tvEmpty = findViewById(R.id.tvEmpty);
@@ -64,9 +74,37 @@ public class AccountantActivity extends AppCompatActivity {
         btnLogout = findViewById(R.id.btnLogout);
 
         setupStatusFilter();
+        setupSearch();
+        setupListClick();
         setupActions();
         loadFees();
         updateNoticeSummary();
+    }
+
+    private void setupSearch() {
+        etSearchStudent.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                searchQuery = normalizeSearchText(s.toString().trim());
+                selectedSearchStudentId = "";
+                applyFilter();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    private void setupListClick() {
+        lvFees.setOnItemClickListener((parent, view, position, id) -> {
+            if (!searchQuery.isEmpty() && selectedSearchStudentId.isEmpty() && position >= 0 && position < searchRows.size()) {
+                selectedSearchStudentId = searchRows.get(position).studentId;
+                applyFilter();
+            }
+        });
     }
 
     private void setupStatusFilter() {
@@ -118,8 +156,18 @@ public class AccountantActivity extends AppCompatActivity {
     }
 
     private void applyFilter() {
+        if (!searchQuery.isEmpty() && selectedSearchStudentId.isEmpty()) {
+            showStudentSearchResults();
+            return;
+        }
+
         displayFees = allFees.stream()
                 .filter(item -> {
+                    if (!selectedSearchStudentId.isEmpty()) {
+                        if (!selectedSearchStudentId.equals(item.getStudentId())) {
+                            return false;
+                        }
+                    }
                     if ("Tat ca".equals(selectedStatus)) return true;
                     if ("Da dong".equals(selectedStatus)) return "PAID".equals(item.getStatus());
                     return !"PAID".equals(item.getStatus());
@@ -136,14 +184,67 @@ public class AccountantActivity extends AppCompatActivity {
         updateSelection();
     }
 
+    private void showStudentSearchResults() {
+        Map<String, StudentSearchRow> unique = new LinkedHashMap<>();
+        for (DatabaseHelper.AccountantFeeRecord item : allFees) {
+            String studentId = normalizeSearchText(item.getStudentId());
+            String studentName = normalizeSearchText(item.getStudentName());
+            if (studentId.contains(searchQuery) || studentName.contains(searchQuery)) {
+                unique.put(item.getStudentId(), new StudentSearchRow(
+                        item.getStudentId(),
+                        item.getStudentName(),
+                        item.getClassName()
+                ));
+            }
+        }
+
+        searchRows = new ArrayList<>(unique.values());
+        List<String> labels = searchRows.stream()
+                .map(row -> row.studentName + " - " + row.studentId + " - " + row.className)
+                .collect(Collectors.toList());
+
+        ArrayAdapter<String> searchAdapter =
+                new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, labels);
+        lvFees.setAdapter(searchAdapter);
+
+        displayFees = new ArrayList<>();
+        boolean empty = labels.isEmpty();
+        tvEmpty.setVisibility(empty ? View.VISIBLE : View.GONE);
+        lvFees.setVisibility(empty ? View.GONE : View.VISIBLE);
+        tvSummary.setText("Tim thay: " + labels.size() + " sinh vien");
+        updateSelection();
+    }
+
     private void updateSummary() {
         int paid = 0;
         int unpaid = 0;
-        for (DatabaseHelper.AccountantFeeRecord fee : allFees) {
+        List<DatabaseHelper.AccountantFeeRecord> source = selectedSearchStudentId.isEmpty() ? allFees : displayFees;
+        for (DatabaseHelper.AccountantFeeRecord fee : source) {
             if ("PAID".equals(fee.getStatus())) paid++;
             else unpaid++;
         }
-        tvSummary.setText("Da dong: " + paid + " | Chua dong: " + unpaid);
+        String prefix = selectedSearchStudentId.isEmpty() ? "" : "Ket qua tim kiem | ";
+        tvSummary.setText(prefix + "Da dong: " + paid + " | Chua dong: " + unpaid);
+    }
+
+    static class StudentSearchRow {
+        final String studentId;
+        final String studentName;
+        final String className;
+
+        StudentSearchRow(String studentId, String studentName, String className) {
+            this.studentId = studentId != null ? studentId : "";
+            this.studentName = studentName != null ? studentName : "";
+            this.className = className != null ? className : "Chua co lop";
+        }
+    }
+
+    private String normalizeSearchText(String value) {
+        if (value == null) return "";
+        String normalized = Normalizer.normalize(value, Normalizer.Form.NFD);
+        normalized = normalized.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        normalized = normalized.replace("đ", "d").replace("Đ", "D");
+        return normalized.toLowerCase(Locale.ROOT);
     }
 
     private void updateSelection() {

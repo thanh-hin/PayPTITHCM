@@ -54,12 +54,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO Student (student_id, full_name, email, password, phone, class_id) VALUES " +
                 "('21520002', 'Trần Thị Bình', 'binh@student.ptithcm.edu.vn', '" + HashUtils.sha256("21520002") + "', '0912345678', 2)");
 
+        db.execSQL("INSERT INTO Student (student_id, full_name, email, password, phone, class_id) VALUES " +
+                "('21520003', 'Nguyễn Văn An', 'n22dcat0211@student.ptithcm.edu.vn', '" + HashUtils.sha256("21520003") + "', '0933333333', 1)");
+
         db.execSQL("INSERT INTO Account (username, password, role, student_id, display_name) VALUES " +
                 "('21520001', '" + HashUtils.sha256("21520001") + "', 'STUDENT', '21520001', 'Nguyễn Văn An')");
         db.execSQL("INSERT INTO Account (username, password, role, student_id, display_name) VALUES " +
                 "('21520002', '" + HashUtils.sha256("21520002") + "', 'STUDENT', '21520002', 'Trần Thị Bình')");
         db.execSQL("INSERT INTO Account (username, password, role, student_id, display_name) VALUES " +
                 "('ketoan', '" + HashUtils.sha256("123456") + "', 'ACCOUNTANT', NULL, 'Kế toán phòng tài chính')");
+        db.execSQL("INSERT INTO Account (username, password, role, student_id, display_name) VALUES " +
+                "('21520003', '" + HashUtils.sha256("21520003") + "', 'STUDENT', '21520003', 'Le Van Nam')");
 
         String sId = "21520001";
 
@@ -361,6 +366,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         private final int id;
         private final String studentId;
         private final String studentName;
+        private final String className;
         private final String feeName;
         private final int semester;
         private final String schoolYear;
@@ -369,11 +375,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         private final String deadline;
         private boolean selected;
 
-        public AccountantFeeRecord(int id, String studentId, String studentName, String feeName,
+        public AccountantFeeRecord(int id, String studentId, String studentName, String className, String feeName,
                                    int semester, String schoolYear, long amount, String status, String deadline) {
             this.id = id;
             this.studentId = studentId;
             this.studentName = studentName;
+            this.className = className;
             this.feeName = feeName;
             this.semester = semester;
             this.schoolYear = schoolYear;
@@ -385,6 +392,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public int getId() { return id; }
         public String getStudentId() { return studentId; }
         public String getStudentName() { return studentName; }
+        public String getClassName() { return className; }
         public String getFeeName() { return feeName; }
         public int getSemester() { return semester; }
         public String getSchoolYear() { return schoolYear; }
@@ -400,8 +408,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
 
         Cursor cursor = db.rawQuery(
-                "SELECT f.*, s.full_name FROM StudentFee f " +
+                "SELECT f.*, s.full_name, c.class_name FROM StudentFee f " +
                         "JOIN Student s ON s.student_id = f.student_id " +
+                        "LEFT JOIN Class c ON c.class_id = s.class_id " +
                         "ORDER BY CASE f.status WHEN 'OVERDUE' THEN 1 WHEN 'UNPAID' THEN 2 ELSE 3 END, f.deadline ASC",
                 null
         );
@@ -411,6 +420,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     cursor.getInt(cursor.getColumnIndexOrThrow("student_fee_id")),
                     cursor.getString(cursor.getColumnIndexOrThrow("student_id")),
                     cursor.getString(cursor.getColumnIndexOrThrow("full_name")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("class_name")),
                     cursor.getString(cursor.getColumnIndexOrThrow("fee_name")),
                     cursor.getInt(cursor.getColumnIndexOrThrow("semester")),
                     cursor.getString(cursor.getColumnIndexOrThrow("school_year")),

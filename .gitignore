@@ -1,6 +1,10 @@
+.idea/
+.vscode/
+.claude/
+*.env
 node_modules/
 .gradle/
 build/
 app/build/
-*.apk
 local.properties
+*.apk

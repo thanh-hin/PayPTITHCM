@@ -78,6 +78,19 @@
         android:paddingHorizontal="12dp"
         android:paddingVertical="10dp">
 
+        <EditText
+            android:id="@+id/etSearchStudent"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1.6"
+            android:background="@drawable/bg_filter_box"
+            android:hint="Tim MSSV hoac ten"
+            android:inputType="text"
+            android:paddingHorizontal="12dp"
+            android:singleLine="true"
+            android:textSize="13sp" />
+
         <Spinner
             android:id="@+id/spinnerStatus"
             android:layout_width="0dp"
