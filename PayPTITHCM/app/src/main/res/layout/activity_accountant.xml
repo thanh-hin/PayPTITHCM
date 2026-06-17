@@ -39,20 +39,6 @@
         </LinearLayout>
 
         <Button
-            android:id="@+id/btnCreateNotice"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:background="@drawable/bg_button_secondary"
-            android:paddingHorizontal="14dp"
-            android:layout_marginEnd="8dp"
-            android:text="Tao thong bao"
-            android:textAllCaps="false"
-            android:textColor="@color/ptit_red"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            app:backgroundTint="@null" />
-
-        <Button
             android:id="@+id/btnLogout"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
@@ -105,24 +91,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/layoutBottom"
-        android:layout_below="@id/tvNoticeSummary"
+        android:layout_below="@id/layoutFilters"
+        android:background="@color/bg_gray"
         android:clipToPadding="false"
         android:divider="@android:color/transparent"
         android:dividerHeight="0dp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp" />
-
-    <TextView
-        android:id="@+id/tvNoticeSummary"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/layoutFilters"
-        android:background="@color/white"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="10dp"
-        android:text="Thong bao da tao: 0"
-        android:textColor="@color/text_sub"
-        android:textSize="13sp" />
 
     <LinearLayout
         android:id="@+id/tvEmpty"

@@ -83,7 +83,6 @@ public class HomeFragment extends Fragment {
 
         SharedPrefs prefs = new SharedPrefs(getContext());
         String mssv = prefs.getUser();
-        if (mssv.isEmpty()) mssv = "21520001";
 
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(getContext());
         Student student = dbHelper.getStudentById(mssv);

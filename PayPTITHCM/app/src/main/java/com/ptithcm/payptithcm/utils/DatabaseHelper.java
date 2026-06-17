@@ -18,7 +18,7 @@ import java.util.Locale;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "payptithcm.db";
-    private static final int DATABASE_VERSION = 16;
+    private static final int DATABASE_VERSION = 18;
 
     private static DatabaseHelper instance;
 
@@ -38,7 +38,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE Class (class_id INTEGER PRIMARY KEY AUTOINCREMENT, class_name TEXT NOT NULL UNIQUE, faculty TEXT, course_year INTEGER)");
         db.execSQL("CREATE TABLE Student (student_id TEXT PRIMARY KEY, full_name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password TEXT NOT NULL, phone TEXT, class_id INTEGER, FOREIGN KEY(class_id) REFERENCES Class(class_id))");
         db.execSQL("CREATE TABLE Account (username TEXT PRIMARY KEY, password TEXT NOT NULL, role TEXT NOT NULL, student_id TEXT, display_name TEXT, FOREIGN KEY(student_id) REFERENCES Student(student_id))");
-        db.execSQL("CREATE TABLE FeeNotice (notice_id INTEGER PRIMARY KEY AUTOINCREMENT, student_id TEXT, class_id INTEGER, title TEXT NOT NULL, content TEXT NOT NULL, amount REAL NOT NULL DEFAULT 0, created_by TEXT, created_at TEXT NOT NULL, FOREIGN KEY(student_id) REFERENCES Student(student_id), FOREIGN KEY(class_id) REFERENCES Class(class_id))");
         db.execSQL("CREATE TABLE StudentFee (student_fee_id INTEGER PRIMARY KEY AUTOINCREMENT, student_id TEXT NOT NULL, fee_name TEXT NOT NULL, semester INTEGER, school_year TEXT, amount REAL NOT NULL, deadline TEXT NOT NULL, status TEXT DEFAULT 'UNPAID', paid_date TEXT, FOREIGN KEY(student_id) REFERENCES Student(student_id))");
         db.execSQL("CREATE TABLE Payment (payment_id INTEGER PRIMARY KEY AUTOINCREMENT, student_id TEXT NOT NULL, fee_name TEXT NOT NULL, amount REAL NOT NULL, method TEXT, status TEXT DEFAULT 'SUCCESS', transaction_id TEXT UNIQUE, payment_date TEXT NOT NULL, FOREIGN KEY(student_id) REFERENCES Student(student_id))");
 
@@ -46,57 +45,48 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void seedData(SQLiteDatabase db) {
-        db.execSQL("INSERT INTO Class (class_name, faculty, course_year) VALUES ('D21CQCN01-N', 'Công nghệ thông tin', 2021)");
-        db.execSQL("INSERT INTO Class (class_name, faculty, course_year) VALUES ('D21CQCN02-N', 'Công nghệ thông tin', 2021)");
+        db.execSQL("INSERT INTO Class (class_name, faculty, course_year) VALUES ('D21CQCN01-N', 'Cong nghe thong tin', 2021)");
+        db.execSQL("INSERT INTO Class (class_name, faculty, course_year) VALUES ('D21CQCN02-N', 'Cong nghe thong tin', 2021)");
 
         db.execSQL("INSERT INTO Student (student_id, full_name, email, password, phone, class_id) VALUES " +
-                "('21520001', 'Nguyễn Văn An', 'n22dcat021@student.ptithcm.edu.vn', '" + HashUtils.sha256("21520001") + "', '0901234567', 1)");
+                "('21520001', 'Nguyen Van An', 'n22dcat021@student.ptithcm.edu.vn', '" + HashUtils.sha256("21520001") + "', '0901234567', 1)");
         db.execSQL("INSERT INTO Student (student_id, full_name, email, password, phone, class_id) VALUES " +
-                "('21520002', 'Trần Thị Bình', 'binh@student.ptithcm.edu.vn', '" + HashUtils.sha256("21520002") + "', '0912345678', 2)");
-
+                "('21520002', 'Tran Thi Binh', 'binh@student.ptithcm.edu.vn', '" + HashUtils.sha256("21520002") + "', '0912345678', 2)");
         db.execSQL("INSERT INTO Student (student_id, full_name, email, password, phone, class_id) VALUES " +
-                "('21520003', 'Nguyễn Văn An', 'n22dcat0211@student.ptithcm.edu.vn', '" + HashUtils.sha256("21520003") + "', '0933333333', 1)");
+                "('21520003', 'Le Van Nam', 'n22dcat0211@student.ptithcm.edu.vn', '" + HashUtils.sha256("21520003") + "', '0933333333', 1)");
 
         db.execSQL("INSERT INTO Account (username, password, role, student_id, display_name) VALUES " +
-                "('21520001', '" + HashUtils.sha256("21520001") + "', 'STUDENT', '21520001', 'Nguyễn Văn An')");
+                "('21520001', '" + HashUtils.sha256("21520001") + "', 'STUDENT', '21520001', 'Nguyen Van An')");
         db.execSQL("INSERT INTO Account (username, password, role, student_id, display_name) VALUES " +
-                "('21520002', '" + HashUtils.sha256("21520002") + "', 'STUDENT', '21520002', 'Trần Thị Bình')");
-        db.execSQL("INSERT INTO Account (username, password, role, student_id, display_name) VALUES " +
-                "('ketoan', '" + HashUtils.sha256("123456") + "', 'ACCOUNTANT', NULL, 'Kế toán phòng tài chính')");
+                "('21520002', '" + HashUtils.sha256("21520002") + "', 'STUDENT', '21520002', 'Tran Thi Binh')");
         db.execSQL("INSERT INTO Account (username, password, role, student_id, display_name) VALUES " +
                 "('21520003', '" + HashUtils.sha256("21520003") + "', 'STUDENT', '21520003', 'Le Van Nam')");
+        db.execSQL("INSERT INTO Account (username, password, role, student_id, display_name) VALUES " +
+                "('ketoan', '" + HashUtils.sha256("123456") + "', 'ACCOUNTANT', NULL, 'Ke toan phong tai chinh')");
 
         String sId = "21520001";
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, semester, school_year, amount, deadline, status, paid_date) VALUES ('" + sId + "', 'Hoc phi', 1, '2022-2023', 7500000, '2022-12-31', 'PAID', '2022-12-10')");
+        db.execSQL("INSERT INTO Payment (student_id, fee_name, amount, method, status, transaction_id, payment_date) VALUES ('" + sId + "', 'Hoc phi HK1 22-23', 7500000, 'Tien mat', 'SUCCESS', 'TXN001', '2022-12-10 08:00:00')");
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, semester, school_year, amount, deadline, status, paid_date) VALUES ('" + sId + "', 'Hoc phi', 2, '2022-2023', 7800000, '2023-06-30', 'PAID', '2023-06-05')");
+        db.execSQL("INSERT INTO Payment (student_id, fee_name, amount, method, status, transaction_id, payment_date) VALUES ('" + sId + "', 'Hoc phi HK2 22-23', 7800000, 'Tien mat', 'SUCCESS', 'TXN002', '2023-06-05 09:00:00')");
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, semester, school_year, amount, deadline, status, paid_date) VALUES ('" + sId + "', 'Hoc phi', 1, '2023-2024', 8200000, '2023-12-31', 'PAID', '2023-12-20')");
+        db.execSQL("INSERT INTO Payment (student_id, fee_name, amount, method, status, transaction_id, payment_date) VALUES ('" + sId + "', 'Hoc phi HK1 23-24', 8200000, 'Tien mat', 'SUCCESS', 'TXN003', '2023-12-20 10:00:00')");
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, semester, school_year, amount, deadline, status, paid_date) VALUES ('" + sId + "', 'Hoc phi', 2, '2023-2024', 8500000, '2024-06-30', 'PAID', '2024-06-10')");
+        db.execSQL("INSERT INTO Payment (student_id, fee_name, amount, method, status, transaction_id, payment_date) VALUES ('" + sId + "', 'Hoc phi HK2 23-24', 8500000, 'Tien mat', 'SUCCESS', 'TXN004', '2024-06-10 11:00:00')");
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, semester, school_year, amount, deadline, status, paid_date) VALUES ('" + sId + "', 'Hoc phi', 1, '2024-2025', 8800000, '2024-12-31', 'PAID', '2024-12-15')");
+        db.execSQL("INSERT INTO Payment (student_id, fee_name, amount, method, status, transaction_id, payment_date) VALUES ('" + sId + "', 'Hoc phi HK1 24-25', 8800000, 'Tien mat', 'SUCCESS', 'TXN005', '2024-12-15 12:00:00')");
 
-        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, semester, school_year, amount, deadline, status, paid_date) VALUES ('" + sId + "', 'Học phí', 1, '2022-2023', 7500000, '2022-12-31', 'PAID', '2022-12-10')");
-        db.execSQL("INSERT INTO Payment (student_id, fee_name, amount, method, status, transaction_id, payment_date) VALUES ('" + sId + "', 'Học phí HK1 22-23', 7500000, 'Tiền mặt', 'SUCCESS', 'TXN001', '2022-12-10 08:00:00')");
-
-        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, semester, school_year, amount, deadline, status, paid_date) VALUES ('" + sId + "', 'Học phí', 2, '2022-2023', 7800000, '2023-06-30', 'PAID', '2023-06-05')");
-        db.execSQL("INSERT INTO Payment (student_id, fee_name, amount, method, status, transaction_id, payment_date) VALUES ('" + sId + "', 'Học phí HK2 22-23', 7800000, 'Tiền mặt', 'SUCCESS', 'TXN002', '2023-06-05 09:00:00')");
-
-        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, semester, school_year, amount, deadline, status, paid_date) VALUES ('" + sId + "', 'Học phí', 1, '2023-2024', 8200000, '2023-12-31', 'PAID', '2023-12-20')");
-        db.execSQL("INSERT INTO Payment (student_id, fee_name, amount, method, status, transaction_id, payment_date) VALUES ('" + sId + "', 'Học phí HK1 23-24', 8200000, 'Tiền mặt', 'SUCCESS', 'TXN003', '2023-12-20 10:00:00')");
-
-        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, semester, school_year, amount, deadline, status, paid_date) VALUES ('" + sId + "', 'Học phí', 2, '2023-2024', 8500000, '2024-06-30', 'PAID', '2024-06-10')");
-        db.execSQL("INSERT INTO Payment (student_id, fee_name, amount, method, status, transaction_id, payment_date) VALUES ('" + sId + "', 'Học phí HK2 23-24', 8500000, 'Tiền mặt', 'SUCCESS', 'TXN004', '2024-06-10 11:00:00')");
-
-        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, semester, school_year, amount, deadline, status, paid_date) VALUES ('" + sId + "', 'Học phí', 1, '2024-2025', 8800000, '2024-12-31', 'PAID', '2024-12-15')");
-        db.execSQL("INSERT INTO Payment (student_id, fee_name, amount, method, status, transaction_id, payment_date) VALUES ('" + sId + "', 'Học phí HK1 24-25', 8800000, 'Tiền mặt', 'SUCCESS', 'TXN005', '2024-12-15 12:00:00')");
-
-        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, semester, school_year, amount, deadline, status) VALUES ('21520001', 'Học phí', 2, '2024-2025', 9200000, '2025-07-31', 'UNPAID')");
-        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, semester, school_year, amount, deadline, status) VALUES ('21520001', 'Lệ phí thi', 2, '2024-2025', 500000, '2025-05-31', 'UNPAID')");
-
-        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, semester, school_year, amount, deadline, status) VALUES ('21520002', 'Học phí', 2, '2024-2025', 9200000, '2025-07-31', 'UNPAID')");
-        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, semester, school_year, amount, deadline, status, paid_date) VALUES ('21520002', 'Học phí', 1, '2024-2025', 8800000, '2024-12-31', 'PAID', '2024-12-20')");
-        db.execSQL("INSERT INTO Payment (student_id, fee_name, amount, method, status, transaction_id, payment_date) VALUES ('21520002', 'Học phí HK1 24-25', 8800000, 'VNPAY', 'SUCCESS', 'TXN006', '2024-12-20 10:00:00')");
-        db.execSQL("INSERT INTO FeeNotice (student_id, class_id, title, content, amount, created_by, created_at) VALUES (NULL, 1, 'Thong bao dong hoc phi', 'Sinh vien lop D21CQCN01-N vui long hoan thanh hoc phi HK2/2024-2025 truoc ngay 31/07/2025.', 9200000, 'ketoan', '2025-06-01 08:00:00')");
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, semester, school_year, amount, deadline, status) VALUES ('21520001', 'Hoc phi', 2, '2024-2025', 9200000, '2025-07-31', 'UNPAID')");
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, semester, school_year, amount, deadline, status) VALUES ('21520001', 'Le phi thi', 2, '2024-2025', 500000, '2025-05-31', 'UNPAID')");
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, semester, school_year, amount, deadline, status) VALUES ('21520002', 'Hoc phi', 2, '2024-2025', 9200000, '2025-07-31', 'UNPAID')");
+        db.execSQL("INSERT INTO StudentFee (student_id, fee_name, semester, school_year, amount, deadline, status, paid_date) VALUES ('21520002', 'Hoc phi', 1, '2024-2025', 8800000, '2024-12-31', 'PAID', '2024-12-20')");
+        db.execSQL("INSERT INTO Payment (student_id, fee_name, amount, method, status, transaction_id, payment_date) VALUES ('21520002', 'Hoc phi HK1 24-25', 8800000, 'VNPAY', 'SUCCESS', 'TXN006', '2024-12-20 10:00:00')");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS Payment");
         db.execSQL("DROP TABLE IF EXISTS StudentFee");
-        db.execSQL("DROP TABLE IF EXISTS FeeNotice");
         db.execSQL("DROP TABLE IF EXISTS Account");
         db.execSQL("DROP TABLE IF EXISTS Student");
         db.execSQL("DROP TABLE IF EXISTS Class");
@@ -250,7 +240,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         while (cursor.moveToNext()) {
             FeeStats stats = new FeeStats();
-            stats.label = "HK" + cursor.getInt(cursor.getColumnIndexOrThrow("semester")) + "\n" + cursor.getString(cursor.getColumnIndexOrThrow("school_year"));
+            String schoolYear = cursor.getString(cursor.getColumnIndexOrThrow("school_year"));
+            String startYear = schoolYear != null && schoolYear.length() >= 4 ? schoolYear.substring(0, 4) : "";
+            stats.label = "Hk" + cursor.getInt(cursor.getColumnIndexOrThrow("semester")) + "/" + startYear;
             stats.paid = cursor.getLong(cursor.getColumnIndexOrThrow("paid"));
             stats.unpaid = cursor.getLong(cursor.getColumnIndexOrThrow("unpaid"));
             list.add(stats);
@@ -482,217 +474,4 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public static class ClassOption {
-        public final int id;
-        public final String name;
-
-        public ClassOption(int id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
-
-    public static class StudentOption {
-        public final String id;
-        public final String name;
-
-        public StudentOption(String id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return id + " - " + name;
-        }
-    }
-
-    public static class FeeNoticeRecord {
-        public final String title;
-        public final String content;
-        public final long amount;
-        public final String createdAt;
-
-        public FeeNoticeRecord(String title, String content, long amount, String createdAt) {
-            this.title = title;
-            this.content = content;
-            this.amount = amount;
-            this.createdAt = createdAt;
-        }
-    }
-
-    public List<ClassOption> getClassOptions() {
-        List<ClassOption> list = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT class_id, class_name FROM Class ORDER BY class_name", null);
-
-        while (cursor.moveToNext()) {
-            list.add(new ClassOption(
-                    cursor.getInt(cursor.getColumnIndexOrThrow("class_id")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("class_name"))
-            ));
-        }
-
-        cursor.close();
-        return list;
-    }
-
-    public List<StudentOption> getStudentsByClass(int classId) {
-        List<StudentOption> list = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery(
-                "SELECT student_id, full_name FROM Student WHERE class_id = ? ORDER BY student_id",
-                new String[]{String.valueOf(classId)}
-        );
-
-        while (cursor.moveToNext()) {
-            list.add(new StudentOption(
-                    cursor.getString(cursor.getColumnIndexOrThrow("student_id")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("full_name"))
-            ));
-        }
-
-        cursor.close();
-        return list;
-    }
-
-    public Integer getClassIdForStudent(String studentId) {
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery(
-                "SELECT class_id FROM Student WHERE student_id = ?",
-                new String[]{studentId}
-        );
-
-        Integer classId = null;
-        if (cursor.moveToFirst() && !cursor.isNull(0)) {
-            classId = cursor.getInt(0);
-        }
-
-        cursor.close();
-        return classId;
-    }
-
-    public boolean createFeeNotice(String title, String content, long amount, Integer classId, String studentId, String createdBy) {
-        SQLiteDatabase db = getWritableDatabase();
-        String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
-        return insertFeeNotice(db, title, content, amount, classId, studentId, createdBy, now) != -1;
-    }
-
-    private long insertFeeNotice(SQLiteDatabase db, String title, String content, long amount,
-                                 Integer classId, String studentId, String createdBy, String now) {
-        ContentValues values = new ContentValues();
-        values.put("title", title);
-        values.put("content", content);
-        values.put("amount", amount);
-        values.put("created_by", createdBy);
-        values.put("created_at", now);
-        if (classId != null) values.put("class_id", classId);
-        if (studentId != null) values.put("student_id", studentId);
-        return db.insert("FeeNotice", null, values);
-    }
-
-    public boolean createFeeDueRequest(String title, String content, long amount, String deadline,
-                                       int semester, String schoolYear,
-                                       Integer classId, String studentId, String createdBy) {
-        SQLiteDatabase db = getWritableDatabase();
-        String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
-
-        db.beginTransaction();
-        try {
-            if (classId != null) {
-                insertFeeNotice(db, title, content, amount, classId, null, createdBy, now);
-                List<StudentOption> students = getStudentsByClass(classId);
-                for (StudentOption student : students) {
-                    insertStudentFee(db, student.id, content, semester, schoolYear, amount, deadline);
-                }
-            } else if (studentId != null) {
-                insertFeeNotice(db, title, content, amount, null, studentId, createdBy, now);
-                insertStudentFee(db, studentId, content, semester, schoolYear, amount, deadline);
-            } else {
-                return false;
-            }
-
-            db.setTransactionSuccessful();
-            return true;
-        } catch (Exception e) {
-            return false;
-        } finally {
-            db.endTransaction();
-        }
-    }
-
-    private void insertStudentFee(SQLiteDatabase db, String studentId, String feeName,
-                                  int semester, String schoolYear, long amount, String deadline) {
-        ContentValues values = new ContentValues();
-        values.put("student_id", studentId);
-        values.put("fee_name", feeName);
-        values.put("semester", semester);
-        values.put("school_year", schoolYear);
-        values.put("amount", amount);
-        values.put("deadline", deadline);
-        values.put("status", "UNPAID");
-        db.insert("StudentFee", null, values);
-    }
-
-    public List<FeeNoticeRecord> getFeeNoticesForStudent(String studentId) {
-        List<FeeNoticeRecord> list = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
-
-        Cursor cursor = db.rawQuery(
-                "SELECT n.title, n.content, n.amount, n.created_at FROM FeeNotice n " +
-                        "LEFT JOIN Student s ON s.student_id = ? " +
-                        "WHERE n.student_id = ? OR (n.class_id IS NOT NULL AND n.class_id = s.class_id) " +
-                        "ORDER BY n.created_at DESC",
-                new String[]{studentId, studentId}
-        );
-
-        while (cursor.moveToNext()) {
-            list.add(new FeeNoticeRecord(
-                    cursor.getString(cursor.getColumnIndexOrThrow("title")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("content")),
-                    (long) cursor.getDouble(cursor.getColumnIndexOrThrow("amount")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("created_at"))
-            ));
-        }
-
-        cursor.close();
-        return list;
-    }
-
-    public int countFeeNotices() {
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM FeeNotice", null);
-
-        int count = 0;
-        if (cursor.moveToFirst()) count = cursor.getInt(0);
-
-        cursor.close();
-        return count;
-    }
-
-    public FeeNoticeRecord getLatestFeeNotice() {
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery(
-                "SELECT title, content, amount, created_at FROM FeeNotice ORDER BY created_at DESC LIMIT 1",
-                null
-        );
-
-        FeeNoticeRecord record = null;
-        if (cursor.moveToFirst()) {
-            record = new FeeNoticeRecord(
-                    cursor.getString(cursor.getColumnIndexOrThrow("title")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("content")),
-                    (long) cursor.getDouble(cursor.getColumnIndexOrThrow("amount")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("created_at"))
-            );
-        }
-
-        cursor.close();
-        return record;
-    }
 }

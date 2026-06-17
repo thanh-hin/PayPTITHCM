@@ -44,7 +44,6 @@ public class HistoryFragment extends Fragment {
         
         SharedPrefs prefs = new SharedPrefs(getContext());
         String mssv = prefs.getUser();
-        if (mssv.isEmpty()) mssv = "21520001"; // Đảm bảo lấy được dữ liệu mẫu
 
         List<HistoryItem> historyList = DatabaseHelper.getInstance(getContext()).getPaymentHistory(mssv);
 

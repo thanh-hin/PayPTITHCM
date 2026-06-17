@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -24,9 +23,7 @@ import com.ptithcm.payptithcm.utils.DatabaseHelper;
 import com.ptithcm.payptithcm.utils.SharedPrefs;
 
 import java.text.Normalizer;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -34,12 +31,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AccountantActivity extends AppCompatActivity {
-    TextView tvSummary, tvNoticeSummary, tvTotalAmount;
+    TextView tvSummary, tvTotalAmount;
     EditText etSearchStudent;
     Spinner spinnerStatus;
     ListView lvFees;
     View tvEmpty;
-    Button btnConfirmCash, btnCreateNotice, btnLogout;
+    Button btnConfirmCash, btnLogout;
 
     List<DatabaseHelper.AccountantFeeRecord> allFees = new ArrayList<>();
     List<DatabaseHelper.AccountantFeeRecord> displayFees = new ArrayList<>();
@@ -63,14 +60,12 @@ public class AccountantActivity extends AppCompatActivity {
         }
 
         tvSummary = findViewById(R.id.tvSummary);
-        tvNoticeSummary = findViewById(R.id.tvNoticeSummary);
         tvTotalAmount = findViewById(R.id.tvTotalAmount);
         etSearchStudent = findViewById(R.id.etSearchStudent);
         spinnerStatus = findViewById(R.id.spinnerStatus);
         lvFees = findViewById(R.id.lvFees);
         tvEmpty = findViewById(R.id.tvEmpty);
         btnConfirmCash = findViewById(R.id.btnConfirmCash);
-        btnCreateNotice = findViewById(R.id.btnCreateNotice);
         btnLogout = findViewById(R.id.btnLogout);
 
         setupStatusFilter();
@@ -78,7 +73,6 @@ public class AccountantActivity extends AppCompatActivity {
         setupListClick();
         setupActions();
         loadFees();
-        updateNoticeSummary();
     }
 
     private void setupSearch() {
@@ -130,7 +124,6 @@ public class AccountantActivity extends AppCompatActivity {
 
     private void setupActions() {
         btnConfirmCash.setOnClickListener(v -> confirmCashPayment());
-        btnCreateNotice.setOnClickListener(v -> showCreateNoticeDialog());
         btnLogout.setOnClickListener(v -> {
             prefs.clearUser();
             Intent intent = new Intent(this, LoginActivity.class);
@@ -142,17 +135,6 @@ public class AccountantActivity extends AppCompatActivity {
     private void loadFees() {
         allFees = DatabaseHelper.getInstance(this).getAllStudentFeesForAccountant();
         applyFilter();
-    }
-
-    private void updateNoticeSummary() {
-        DatabaseHelper db = DatabaseHelper.getInstance(this);
-        int count = db.countFeeNotices();
-        DatabaseHelper.FeeNoticeRecord latest = db.getLatestFeeNotice();
-        if (latest == null) {
-            tvNoticeSummary.setText("Thong bao da tao: 0");
-        } else {
-            tvNoticeSummary.setText("Thong bao da tao: " + count + " | Moi nhat: " + latest.title + " - " + String.format("%,d d", latest.amount));
-        }
     }
 
     private void applyFilter() {
@@ -291,106 +273,4 @@ public class AccountantActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void showCreateNoticeDialog() {
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_create_fee_notice, null);
-        EditText etTitle = dialogView.findViewById(R.id.etNoticeTitle);
-        EditText etContent = dialogView.findViewById(R.id.etNoticeContent);
-        EditText etStudentId = dialogView.findViewById(R.id.etStudentId);
-        EditText etAmount = dialogView.findViewById(R.id.etAmount);
-        EditText etDeadline = dialogView.findViewById(R.id.etDeadline);
-        Spinner spinnerSchoolYear = dialogView.findViewById(R.id.spinnerSchoolYear);
-        Spinner spinnerSemester = dialogView.findViewById(R.id.spinnerSemester);
-        CheckBox cbWholeClass = dialogView.findViewById(R.id.cbWholeClass);
-
-        etTitle.setText("Thong bao dong hoc phi");
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_MONTH, 30);
-        etDeadline.setText(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.getTime()));
-
-        List<String> schoolYears = new ArrayList<>();
-        schoolYears.add("2024-2025");
-        schoolYears.add("2025-2026");
-        schoolYears.add("2026-2027");
-        ArrayAdapter<String> yearAdapter =
-                new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, schoolYears);
-        spinnerSchoolYear.setAdapter(yearAdapter);
-
-        List<String> semesters = new ArrayList<>();
-        semesters.add("Hoc ky 1");
-        semesters.add("Hoc ky 2");
-        semesters.add("Hoc ky 3");
-        ArrayAdapter<String> semesterAdapter =
-                new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, semesters);
-        spinnerSemester.setAdapter(semesterAdapter);
-        spinnerSemester.setSelection(1);
-
-        DatabaseHelper db = DatabaseHelper.getInstance(this);
-
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setView(dialogView)
-                .setPositiveButton("Gui", null)
-                .setNegativeButton("Huy", null)
-                .create();
-
-        dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String title = etTitle.getText().toString().trim();
-            String content = etContent.getText().toString().trim();
-            String studentIdInput = etStudentId.getText().toString().trim();
-            String amountInput = etAmount.getText().toString().trim();
-            String deadline = etDeadline.getText().toString().trim();
-            String schoolYear = spinnerSchoolYear.getSelectedItem().toString();
-            int semester = spinnerSemester.getSelectedItemPosition() + 1;
-
-            if (title.isEmpty() || content.isEmpty() || studentIdInput.isEmpty() || amountInput.isEmpty() || deadline.isEmpty()) {
-                Toast.makeText(this, "Vui long nhap day du thong tin", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            long amount;
-            try {
-                amount = Long.parseLong(amountInput);
-            } catch (NumberFormatException e) {
-                Toast.makeText(this, "So tien khong hop le", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (amount <= 0) {
-                Toast.makeText(this, "So tien phai lon hon 0", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (!deadline.matches("\\d{4}-\\d{2}-\\d{2}")) {
-                Toast.makeText(this, "Han dong phai co dang yyyy-MM-dd", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            Integer classId = null;
-            String studentId = studentIdInput;
-            if (db.getStudentById(studentIdInput) == null) {
-                Toast.makeText(this, "Khong tim thay MSSV nay", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (cbWholeClass.isChecked()) {
-                classId = db.getClassIdForStudent(studentIdInput);
-                studentId = null;
-                if (classId == null) {
-                    Toast.makeText(this, "Sinh vien nay chua co lop", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-            }
-
-            boolean ok = db.createFeeDueRequest(title, content, amount, deadline, semester, schoolYear, classId, studentId, prefs.getUser());
-            if (ok) {
-                Toast.makeText(this, "Da tao khoan phi can dong", Toast.LENGTH_SHORT).show();
-                updateNoticeSummary();
-                loadFees();
-                dialog.dismiss();
-            } else {
-                Toast.makeText(this, "Khong the tao khoan phi", Toast.LENGTH_LONG).show();
-            }
-        }));
-
-        dialog.show();
-    }
 }

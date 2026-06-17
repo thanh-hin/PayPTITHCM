@@ -60,16 +60,6 @@ public class LoginActivity extends AppCompatActivity {
         btnGoogleLogin = findViewById(R.id.btnGoogleLogin);
         tvGeneratedOtp = findViewById(R.id.tvGeneratedOtp);
 
-        if (etIdentifier != null) {
-            etIdentifier.setText("21520001");
-        }
-
-        if (etPassword != null) {
-            etPassword.setText("21520001");
-        }
-
-        generateAndShowOtp();
-
         if (btnSendOtp != null) {
             btnSendOtp.setOnClickListener(v -> generateAndShowOtp());
         }
@@ -91,9 +81,6 @@ public class LoginActivity extends AppCompatActivity {
             tvGeneratedOtp.setVisibility(View.VISIBLE);
         }
 
-        if (etTotp != null) {
-            etTotp.setText(currentOtp);
-        }
 
         Toast.makeText(this, "Mã OTP mới: " + currentOtp, Toast.LENGTH_SHORT).show();
     }
