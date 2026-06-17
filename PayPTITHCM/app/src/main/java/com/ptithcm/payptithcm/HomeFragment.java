@@ -148,6 +148,8 @@ public class HomeFragment extends Fragment {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
         xAxis.setGranularity(1f);
+        xAxis.setTextSize(9f);
+        xAxis.setLabelRotationAngle(-25f);
         xAxis.setDrawGridLines(false);
         xAxis.setYOffset(5f);
 

@@ -250,7 +250,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         while (cursor.moveToNext()) {
             FeeStats stats = new FeeStats();
-            stats.label = "HK" + cursor.getInt(cursor.getColumnIndexOrThrow("semester")) + "\n" + cursor.getString(cursor.getColumnIndexOrThrow("school_year")).substring(2, 4);
+            stats.label = "HK" + cursor.getInt(cursor.getColumnIndexOrThrow("semester")) + "\n" + cursor.getString(cursor.getColumnIndexOrThrow("school_year"));
             stats.paid = cursor.getLong(cursor.getColumnIndexOrThrow("paid"));
             stats.unpaid = cursor.getLong(cursor.getColumnIndexOrThrow("unpaid"));
             list.add(stats);

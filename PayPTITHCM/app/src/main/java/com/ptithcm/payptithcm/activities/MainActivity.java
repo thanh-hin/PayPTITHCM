@@ -67,11 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 btnBackHeader.setVisibility(position == TAB_HOME ? View.GONE : View.VISIBLE);
 
                 if (isNavigating) return;
-                isNavigating = true;
-                if (position == TAB_FEES) bottomNav.setSelectedItemId(R.id.nav_fees);
-                else if (position == TAB_HOME) bottomNav.setSelectedItemId(R.id.nav_home);
-                else if (position == TAB_PROFILE) bottomNav.setSelectedItemId(R.id.nav_profile);
-                isNavigating = false;
+                syncBottomNavForTab(position);
             }
         });
 
@@ -95,17 +91,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Xử lý sự kiện nhấn nút Trở về
         btnBackHeader.setOnClickListener(v -> {
+            int targetTab;
             if (!navigationStack.isEmpty()) {
-                int lastTab = navigationStack.pop();
-                isNavigating = true;
-                viewPager.setCurrentItem(lastTab, false);
-                isNavigating = false;
+                targetTab = navigationStack.pop();
             } else {
                 // Nếu stack trống, mặc định về Home
-                isNavigating = true;
-                viewPager.setCurrentItem(TAB_HOME, false);
-                isNavigating = false;
+                targetTab = TAB_HOME;
             }
+            viewPager.setCurrentItem(targetTab, false);
+            syncBottomNavForTab(targetTab);
         });
 
         // Mặc định vào trang Home
@@ -117,6 +111,19 @@ public class MainActivity extends AppCompatActivity {
         // Tránh lưu trùng lặp liên tiếp hoặc lưu trang Home vào stack quá nhiều
         if (navigationStack.isEmpty() || navigationStack.peek() != tabIndex) {
             navigationStack.push(tabIndex);
+        }
+    }
+
+    private void syncBottomNavForTab(int tabIndex) {
+        int navId = -1;
+        if (tabIndex == TAB_FEES) navId = R.id.nav_fees;
+        else if (tabIndex == TAB_HOME) navId = R.id.nav_home;
+        else if (tabIndex == TAB_PROFILE) navId = R.id.nav_profile;
+
+        if (navId != -1 && bottomNav.getSelectedItemId() != navId) {
+            isNavigating = true;
+            bottomNav.setSelectedItemId(navId);
+            isNavigating = false;
         }
     }
 
