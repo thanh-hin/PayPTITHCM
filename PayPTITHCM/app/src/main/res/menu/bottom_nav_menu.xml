@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/nav_fees"    android:icon="@drawable/ic_nav_fee"     android:title="Học phí" />
+    <item android:id="@+id/nav_home"    android:icon="@drawable/ic_nav_home"    android:title="Trang chủ" />
+    <item android:id="@+id/nav_profile" android:icon="@drawable/ic_nav_profile" android:title="Cá nhân" />
+</menu>

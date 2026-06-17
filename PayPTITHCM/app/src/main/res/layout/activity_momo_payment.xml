@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#A50064">
+
+    <!-- ===== HEADER MOMO ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="28dp"
+        android:paddingTop="48dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="M"
+            android:textSize="48sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="#CC007A"
+            android:padding="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MoMo"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="12dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ví điện tử MoMo"
+            android:textSize="14sp"
+            android:textColor="#FFB3D9"
+            android:layout_marginTop="4dp"/>
+    </LinearLayout>
+
+    <!-- ===== CARD THANH TOÁN ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:background="#F8F8F8"
+        android:padding="20dp">
+
+        <!-- Tổng tiền -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/bg_card"
+            android:elevation="3dp"
+            android:padding="20dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Số tiền thanh toán"
+                android:textSize="13sp"
+                android:textColor="#888888"/>
+
+            <TextView
+                android:id="@+id/tvMomoAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 đ"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="#A50064"
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:id="@+id/tvMomoFeeName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="#555555"
+                android:layout_marginTop="8dp"
+                android:gravity="center"/>
+        </LinearLayout>
+
+        <!-- Nhập SĐT -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Số điện thoại MoMo của bạn"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#444444"
+            android:layout_marginBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/etMomoPhone"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:hint="Nhập số điện thoại (10 số)"
+            android:textSize="16sp"
+            android:paddingHorizontal="16dp"
+            android:background="@drawable/bg_input"
+            android:inputType="phone"
+            android:textColor="#222222"
+            android:textColorHint="#AAAAAA"
+            android:layout_marginBottom="24dp"/>
+
+        <Button
+            android:id="@+id/btnConfirmMomo"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:text="Xác nhận thanh toán"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:background="#A50064"
+            android:stateListAnimator="@null"
+            android:layout_marginBottom="12dp"/>
+
+        <Button
+            android:id="@+id/btnCancelMomo"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Huỷ"
+            android:textAllCaps="false"
+            android:textSize="15sp"
+            android:background="@drawable/bg_button_secondary"
+            android:textColor="#666666"
+            android:stateListAnimator="@null"/>
+    </LinearLayout>
+</LinearLayout>

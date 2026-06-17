@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg_gray">
+
+    <!-- ===== HEADER GRADIENT ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_header"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="40dp"
+        android:gravity="center">
+
+        <!-- Avatar circle -->
+        <LinearLayout
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/bg_icon_circle"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/tvAvatarInitial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="👤"
+                android:textSize="32sp"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvProfileName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="..."
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="12dp"/>
+
+        <TextView
+            android:id="@+id/tvProfileMSSV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MSSV: ..."
+            android:textColor="#FFD6D6"
+            android:textSize="13sp"
+            android:layout_marginTop="4dp"/>
+    </LinearLayout>
+
+    <!-- ===== INFO CARD (nổi lên trên header) ===== -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:elevation="6dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="-20dp"
+                android:padding="20dp">
+
+                <!-- Lớp -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingVertical="12dp">
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:text="Lớp"
+                        android:textSize="13sp"
+                        android:textColor="@color/text_hint"/>
+                    <TextView
+                        android:id="@+id/tvProfileClass"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_main"/>
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider"/>
+
+                <!-- Khoa -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingVertical="12dp">
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:text="Khoa"
+                        android:textSize="13sp"
+                        android:textColor="@color/text_hint"/>
+                    <TextView
+                        android:id="@+id/tvProfileFaculty"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_main"/>
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider"/>
+
+                <!-- Email -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingVertical="12dp">
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:text="Email"
+                        android:textSize="13sp"
+                        android:textColor="@color/text_hint"/>
+                    <TextView
+                        android:id="@+id/tvProfileEmail"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_main"/>
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider"/>
+
+                <!-- SĐT -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingVertical="12dp">
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:text="Điện thoại"
+                        android:textSize="13sp"
+                        android:textColor="@color/text_hint"/>
+                    <TextView
+                        android:id="@+id/tvProfilePhone"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_main"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- ===== LOGOUT BUTTON ===== -->
+            <Button
+                android:id="@+id/btnLogout"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="20dp"
+                android:text="🚪  Đăng xuất"
+                android:textAllCaps="false"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:background="@drawable/bg_button_primary"
+                android:textColor="#FFFFFF"
+                android:stateListAnimator="@null"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

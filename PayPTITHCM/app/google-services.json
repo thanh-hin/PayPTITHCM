@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "37415842848",
+    "project_id": "payptithcm",
+    "storage_bucket": "payptithcm.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:37415842848:android:488a25e720377a1f287845",
+        "android_client_info": {
+          "package_name": "com.ptithcm.payptithcm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "37415842848-m330nev1v5vufh73c3giej9b89fsfolu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ptithcm.payptithcm",
+            "certificate_hash": "3595057420589431e80231d1431f5e51ab9e2def"
+          }
+        },
+        {
+          "client_id": "37415842848-6h7ilijrgpe8ruovn68vjlje02sekof7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9kUXMdfEgmwW1Vs3E_d4vyJeXueJaMSo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "37415842848-6h7ilijrgpe8ruovn68vjlje02sekof7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tông màu chủ đạo: Đỏ PTIT và Trắng tinh -->
+    <color name="ptit_red">#CE0707</color>
+    <color name="ptit_red_dark">#A30505</color>
+    <color name="ptit_red_medium">#CE0707</color> <!-- Đổi về đỏ thuần để tránh màu hồng -->
+    <color name="ptit_red_light">#FFFFFF</color>  <!-- Đổi về trắng tinh -->
+
+    <!-- Các màu nền và bổ trợ (Trắng tinh khiết) -->
+    <color name="white">#FFFFFF</color>
+    <color name="bg_white">#FFFFFF</color>
+    <color name="bg_gray">#FAFAFA</color>
+    <color name="divider">#EEEEEE</color>
+    <color name="divider_color">#EEEEEE</color>
+
+    <!-- Màu chữ -->
+    <color name="text_main">#1A1A1A</color>
+    <color name="text_sub">#616161</color>
+    <color name="text_hint">#BDBDBD</color>
+
+    <!-- Navigation -->
+    <color name="nav_selected">#CE0707</color>
+
+    <!-- Trạng thái thanh toán (Giữ màu xanh/vàng nhưng làm sạch nền) -->
+    <color name="status_paid">#15803D</color>
+    <color name="status_paid_bg">#F0FDF4</color>
+
+    <color name="status_overdue">#B45309</color>
+    <color name="status_overdue_bg">#FFFBEB</color>
+
+    <color name="status_unpaid">#CE0707</color>
+    <color name="status_unpaid_bg">#FFFFFF</color> <!-- Bỏ nền hồng, dùng nền trắng -->
+</resources>
